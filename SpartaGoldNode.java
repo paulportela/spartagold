@@ -1,4 +1,7 @@
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -19,11 +22,12 @@ public class SpartaGoldNode extends Node //implements Serializable
 	public static final String REPLY = "REPL";
 	public static final String ERROR = "ERRO";
 	
-	//For testing purposes
-	private String simpleMessage;
 	
 	private Hashtable<String, String> transactions;
 	private Hashtable<String, String> ledger;
+	
+	//Zeroes required for proof-work solution
+	private static final int NUMOFZEROES = 4;
 	
 	public SpartaGoldNode(int maxPeers, PeerInfo myInfo)
 	{
@@ -42,7 +46,6 @@ public class SpartaGoldNode extends Node //implements Serializable
 		this.addHandler(TRANSACTION, new TransactionHandler(this));
 		this.addHandler(SENDSIMPLEMESSAGE, new SentMessageHandler(this));
 		
-		simpleMessage = "";
 	}
 	
 	/**
@@ -165,24 +168,6 @@ public class SpartaGoldNode extends Node //implements Serializable
 	}
 	
 	/**
-	 * Handles a simple messages. Used for testing.
-	 */
-	private class SentMessageHandler implements HandlerInterface 
-	{
-		private Node peer;
-		
-		public SentMessageHandler(Node peer) 
-		{
-			this.peer = peer;
-		}
-		
-		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
-		{
-			setSimpleMessage(msg.getMsgData());
-		}
-	}
-	
-	/**
 	 * Sends this peer's list of peers. 
 	 */
 	private class ListHandler implements HandlerInterface 
@@ -251,6 +236,24 @@ public class SpartaGoldNode extends Node //implements Serializable
 		}
 	}
 	
+	public static StringBuilder hash(String data) throws NoSuchAlgorithmException
+	{
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		md.update(data.getBytes());
+		byte[] bytes = md.digest();
+		StringBuilder binary = new StringBuilder();
+		for (byte b : bytes)
+		{
+		   int val = b;
+		   for (int i = 0; i < 8; i++)
+		   {
+		      binary.append((val & 128) == 0 ? 0 : 1);
+		      val <<= 1;
+		   }
+		}
+		return binary;
+	}
+	
 	/**
 	 * Handles a solution of the proof-of-work by verifying it.
 	 */
@@ -272,10 +275,7 @@ public class SpartaGoldNode extends Node //implements Serializable
 			}
 			else
 			{
-				for (PeerInfo pd : peer.getAllKnownPeers()) 
-				{
-					peer.connectAndSend(pd, FOUNDSOLUTION, msg.getMsgData(), false);
-				}
+				
 			}
 		}
 		
@@ -283,11 +283,13 @@ public class SpartaGoldNode extends Node //implements Serializable
 		 * Hashes the message info with the answer to verify the solution.
 		 * @param answer the solution found
 		 * @return the boolean value
+		 * @throws UnsupportedEncodingException 
 		 */
-		public boolean verifySolution(String answer)
+		public boolean verifySolution(String answer) throws UnsupportedEncodingException
 		{
 			//Hash verifier
-			return false;
+			String zeroes = String.format(String.format("%%%ds", NUMOFZEROES), " ").replace(" ","0");
+			return true;
 		}
 	}
 	
@@ -308,18 +310,11 @@ public class SpartaGoldNode extends Node //implements Serializable
 			transactions.put(peerconn.getPeerInfo().getId(), msg.getMsgData());
 			
 			//Sending a broadcast message to everybody in the list of peers.
-			broadcastMessage(TRANSACTION, msg.getMsgData(), false);
+			for (PeerInfo pd : peer.getAllKnownPeers()) 
+			{
+				peer.connectAndSend(pd, TRANSACTION, msg.getMsgData(), false);
+			}
 			
 		}
-	}
-	
-	public void setSimpleMessage(String s)
-	{
-		simpleMessage = s;
-	}
-	
-	public String getSimpleMessage()
-	{
-		return simpleMessage;
 	}
 }

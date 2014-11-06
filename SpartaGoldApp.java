@@ -23,7 +23,7 @@ public class SpartaGoldApp
 	public SpartaGoldApp(String initialhost, int initialport, int maxpeers, PeerInfo mypd)
 	{
 		peer = new SpartaGoldNode(maxpeers, mypd);
-		peer.buildPeers(initialhost, initialport, 2);
+		peer.buildPeers(initialhost, initialport, 2	);
 		
 		JButton refresh = new JButton("Refresh");
 		refresh.addActionListener(new refreshButtonListener());
