@@ -65,10 +65,11 @@ public class menu {
      * display main menu
      */
     public int displayMenu() {
-        screen.displayMessage("\n 1:Ledger");
-        screen.displayMessage("\n 2:Send Gold");
-        screen.displayMessage("\n 3:Recieve Gold");
-        screen.displayMessage("\n 4:Exit \n");
+        screen.displayMessage("\n 1:getLedger");
+        screen.displayMessage("\n 2:showLedger");
+        screen.displayMessage("\n 3:transfer");
+        screen.displayMessage("\n 4:help \n");
+        screen.displayMessage("\n 5:EXIT \n");
 
         // return keypad.hashCode();
         return getinput.getInput();
