@@ -278,14 +278,20 @@ public class SpartaGoldNode extends Node //implements Serializable
 		
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
 		{
-			boolean solution = verifySolution(msg.getMsgData());
-			if(!solution)
-			{
-				peerconn.sendData(new PeerMessage(ERROR, "Not a solution"));
-			}
-			else
-			{
-				
+			boolean solution;
+			try {
+				solution = verifySolution(msg.getMsgData());
+				if(!solution)
+				{
+					peerconn.sendData(new PeerMessage(ERROR, "Not a solution"));
+				}
+				else
+				{
+					
+				}
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
