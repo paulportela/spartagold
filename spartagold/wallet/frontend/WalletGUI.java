@@ -5,7 +5,9 @@ import java.awt.*;
 import javax.swing.*;
 
 import spartagold.framework.PeerInfo;
-import spartagold.wallet.backend.GenSig;
+import spartagold.wallet.backend.GenKeys;
+import spartagold.wallet.backend.ProofOfWork;
+import spartagold.wallet.backend.SignTransaction;
 import spartagold.wallet.backend.SpartaGoldNode;
 
 import java.awt.event.ActionListener;
@@ -37,10 +39,10 @@ public class WalletGUI {
 			public void run() {
 				try {
 					myIpAddress = getIpAddress();
-					boolean checkPubKey = new File("", "publickey").exists();
-					if (!checkPubKey) {
+					boolean checkPubKey = new File("", "publickey.txt").exists();
+					boolean checkPrivKey = new File("", "privatekey.txt").exists();
+					if (!checkPubKey && !checkPrivKey) {
 						GenKeys keygen = new GenKeys();
-						keygen.generate();
 					}
 					WalletGUI window = new WalletGUI("localhost", 9001, 5, new PeerInfo(myIpAddress, 9000));
 					window.frmSpartagoldWallet.setVisible(true);
@@ -63,6 +65,9 @@ public class WalletGUI {
 		(new Thread() { public void run() { peer.mainLoop(); }}).start();
 		
         
+		
+		
+		//GUI start
 		frmSpartagoldWallet = new JFrame();
 		frmSpartagoldWallet.setBackground(new Color(11, 46, 70));
 		frmSpartagoldWallet.getContentPane().setBackground(new Color(11, 46, 70));
@@ -104,11 +109,25 @@ public class WalletGUI {
 		btnMine.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				isMining = true;
-				//TODO: begin mining here
+				while(isMining) {
+					//TODO: take top from validTransList and put into proof of work
+					//TODO: set as separate thread so cancel button works during while loop
+					ProofOfWork mine = new ProofOfWork(transaction);
+					mine.findProof();
+				}
 			}
 		});
-		btnMine.setBounds(215, 162, 154, 44);
+		btnMine.setBounds(218, 97, 154, 44);
 		mine.add(btnMine);
+		
+		JButton btnStop = new JButton("Stop");
+		btnStop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				isMining = false;
+			}
+		});
+		btnStop.setBounds(249, 152, 89, 23);
+		mine.add(btnStop);
 		
 		JPanel panel = new JPanel();
 		panel.setBackground(UIManager.getColor("activeCaption"));
@@ -166,11 +185,7 @@ public class WalletGUI {
 			public void actionPerformed(ActionEvent arg0) {
 				if (tfAmount.getText() != "" && tfAddress.getText()!= ""){
 					
-					//TEMP ZONE
 					//TODO: broadcast message here
-					
-					
-					//END TEMP ZONE
 					
 					
 				}
@@ -178,6 +193,8 @@ public class WalletGUI {
 				tfAddress.setText("");
 			}
 		});
+		
+		//GUI end
 	}
 	
 	public static String getIpAddress() { 
@@ -217,7 +234,6 @@ public class WalletGUI {
 
 	    return null;
 	}
-
 }
 
 

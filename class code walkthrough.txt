@@ -1,0 +1,88 @@
+class and code walkthrough
+
+
+problems: don't know how messages are sent, or how we are going to send keys
+
+start:
+
+local files:
+	ledger: stores a list of readable, clear transactions (clearTrans: transID, amount, receiverPubKey, validity)
+	privatekey: generated, necessary
+	publickey: generated, necessary
+	verTransList: list of verified transactions (transactions of users that have the right amount)
+
+
+WalletGUI:
+	Checks to see if pubkey and privkey exist
+	if not, create
+	create window with localhost:9001 and myIPAddress:9000
+	-double check peer initiation and new thread if correct
+	contains GUI
+	initialize validTransactions
+	btnMine: always listening, may need new thread:
+		if clicked:
+			isMining=true
+			start separate thread
+			fetch top of validTransList
+			send transaction to ProofOfWork
+	btnStop: if clicked: isMining=false
+		should stop mining
+	btnSend: if clicked, broadcast transaction as string, message TRANSACTION
+
+
+Transaction:
+	takes string transaction
+	breaks into 6 parts
+	methods to retrieve each part
+	methods to set each part
+	clearTrans consists of last 4 parts
+	getClearTrans method
+
+
+VerifyTransaction:
+	takes Transaction type transaction
+	used to verify every transaction received
+	-needs to always listen or something, adds to list after each verification
+	once verified, add to a list of verified transactions verTransList (for loop described below)
+	max cap on verTransList = ?
+	takes Transaction type transaction
+	call getSenderPubKey, getReceiverPubKey, getSignedClearTrans, getClearTrans
+	use senderPubKey on getSignedClearTrans, compare to clearTrans
+	verify for loop:
+		take each line of ledger, turn it into Transaction type
+		if this.senderPubKey == ledger.receiverPubKey && ledger.isValid == true
+			tempAmount += ledger.amount
+			add to verTransList
+
+
+ProofOfWork:
+	takes Transaction type transaction
+	opens ledger in reader
+	saves each line as type Transaction in arraylist
+	findProof:
+		creates random string of random length 1 to 10
+		hashes last transaction on ledger
+		concatenate random string, hashedLastTrans, clearTrans
+		hash of concatenated string
+		convert string to readable
+		truncate to NUMBER_OF_ZEROES
+		compares string to zeroes, if string contains zeroes:
+			read in own pubKey as minersPubKey
+			broadcast FOUNDSOLUTION message containing proof, clearTrans, hashedLastTrans, minerPubKey, validtrans?
+	readLastTrans method: returns last readable line of ledger
+
+
+VerifyProof:
+	takes in string solution (string contains proof, clearTrans, hashedLastTrans, minerPubKey, validtrans?)
+	opens verTransList in reader
+	opens ledger in reader
+	saves each line as type Transaction in arraylist
+	save each part of solution in separate variables
+	truncate proof to first 3 characters
+	if truncated proof contains zeroes:
+		for verTransList loop:
+			for ledger loop:
+				if verTransList.get(i).gettransID == ledger.get(j).gettransID
+					ledger.get(j).setValid(false)
+					tempAmount += ledger.get(j).amount
+

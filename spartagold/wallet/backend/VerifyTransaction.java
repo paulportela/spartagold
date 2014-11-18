@@ -1,8 +1,5 @@
 package spartagold.wallet.backend;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 public class VerifyTransaction {
 
 	private String trans;

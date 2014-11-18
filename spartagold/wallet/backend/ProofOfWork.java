@@ -48,25 +48,7 @@ public class ProofOfWork {
 	}
 	
 	public void findProof() throws UnsupportedEncodingException, Exception {
-		//fill list of valid transactions, may need to move to other class
-		int tempAmount = 0;
-		List<String> validTrans = new ArrayList<String>();
-		for (int i = 0; i < ledger.length; i++) {
-			String[] ledgerLineInfo = ledger[i].split("\t");
-			String lhashID = ledgerLineInfo[0];
-			String lamount = ledgerLineInfo[1];
-			String lreceiverPubKey = ledgerLineInfo[2];
-			String lvalid = ledgerLineInfo[3];
-			if (senderPubKey == lreceiverPubKey && lvalid == "valid") {
-				tempAmount += Integer.parseInt(lamount);
-				validTrans.add(lhashID);
-			}
-			if (tempAmount >= Integer.parseInt(lamount)){
-				i = ledger.length;
-			}		
-		}
-		
-		//TODO: needs check to see if isMining=true
+
 		int randomNum = 1 + (int)(Math.random()*10); 
 		StringBuffer buffer = new StringBuffer();
 		int charactersLength = characters.length();
@@ -91,9 +73,9 @@ public class ProofOfWork {
 		
 		//convert randString to hashed proof, truncated to first three positions
 		String proof = DatatypeConverter.printHexBinary(digest2);
-		String trunc = proof.substring(0, 3);
+		String trunc = proof.substring(0, NUMBER_OF_ZEROES);
 		
-		//check to see if first three positions are zeroes
+		//check to see if first positions are zeroes
 		String zeroes = String.format(String.format("%%%ds", NUMBER_OF_ZEROES), " ").replace(" ","0");
 		if (trunc.toLowerCase().contains(zeroes)) {
 			//TODO: broadcast FOUNDSOLUTION containing proof|cleartrans|hashedLastTrans|miner's pub key|validtrans

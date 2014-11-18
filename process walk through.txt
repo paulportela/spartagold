@@ -1,0 +1,86 @@
+from beginning:
+
+start wallet for first time:
+checks to see if public and private keys exist, if not then create both
+
+
+front side:
+receiver's public key: here
+amount: here
+
+back side: hash(rand num)
+cleartrans = hashID|amount|receiverpubkey|validity
+
+String trans = sign(cleartrans)|senderpubkey|cleartrans
+
+broadcast trans as message type TRANSACTION
+
+nodes connected will verify:
+	break message into senderpubkey, sign(cleartrans), cleartrans
+	take senderpubkey from message, use to decrypt sign(cleartrans)
+	compare result of decrypted sign(cleartrans) with cleartrans
+	check ledger to see if sender has enough coins by comparing senderpubkey to list of transactions
+	add up to >= amount being sent
+	
+	save verified transactions into verTransList
+		verTransList.add(cleartrans|valid)
+
+nodes broadcast original unverified to other nodes
+
+
+
+to mine:
+
+always listening, does not perform proof of work until button is clicked
+
+once button is clicked, boolean isMining = true:
+
+pull first cleartrans and valid from verTransList
+
+prevtrans = last readable row/transaction of ledger
+
+take amount from cleartrans, look through each receiverspubkey, log the ID for each transaction that equals
+	tempamount = 0;
+	list validtrans = null;
+	for(i=0;i < ledger.length;i++){
+		if (senderpubkey == ledger[i].pubkey && ledger[i].isValid):
+			tempamount += ledger[i].amount
+			validtrans.add(transID)
+		if (tempamount >= cleartrans.amount):
+			i = ledger.length
+	}
+
+perform proof of work as a while loop while(isMining == true):
+	hash(verified transaction + random string + hash(prevtrans))
+	proof = random string
+
+if proof found, broadcast to all nodes as message FOUNDSOLUTION:
+	proof|cleartrans|hash(prevtrans)|miner's pub key|validtrans
+
+if proof not found, loop back to proof of work
+
+if user received message type FOUNDSOLUTION, handle with solutionfoundhandler:
+	verify proof by substring of hash(verified transaction + proof + hash(prevtrans)) == NUMBER_OF_ZEROES
+	if equal:
+		tempamount = 0;
+		for(validtrans i):
+			for(ledger j):
+				if (validtrans[i] == ledger[j]):
+					ledger[j].valid = false;
+					tempamount += ledger[j].amount
+		add cleartrans + hash(prevtrans) to ledger
+		add new clear transaction of hashID|rewardamount|minerspubkey|null
+		if (tempamount > cleartrans.amount):
+			ledger.add(hashID|tempamount - cleartrans.amount|minerspubkey|null)
+	if not equal, reply message ERROR to miner
+
+if message type FOUNDSOLUTION received while own proof == null, replace transaction with next line in verTransList
+
+if Cancel button clicked, set isMining = false
+
+
+
+
+to update GUI balance label:
+
+read through each line of transactions in ledger, add and subtract for own public key
