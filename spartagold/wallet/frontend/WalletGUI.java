@@ -39,7 +39,8 @@ public class WalletGUI {
 					myIpAddress = getIpAddress();
 					boolean checkPubKey = new File("", "publickey").exists();
 					if (!checkPubKey) {
-						//TODO: GenSig gen = new GenSig(need to put a file in here to generate pub key or tweak pub key somehow);
+						GenKeys keygen = new GenKeys();
+						keygen.generate();
 					}
 					WalletGUI window = new WalletGUI("localhost", 9001, 5, new PeerInfo(myIpAddress, 9000));
 					window.frmSpartagoldWallet.setVisible(true);
