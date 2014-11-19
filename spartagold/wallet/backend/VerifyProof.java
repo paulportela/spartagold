@@ -7,23 +7,46 @@ import java.util.List;
 
 public class VerifyProof {
 	
+	//NO INSTANCE VARIABLES
 	private String proof;
 	private String hashID;
 	private String amount;
 	private String receiverPubKey;
 	private String valid;
-	private List<String> ledgerArr = new ArrayList<String>();
-	private String[] ledger;
+	private List<Transaction> ledgerArr = new ArrayList<Transaction>();
+	private List<Transaction> verTransList = new ArrayList<Transaction>();
 	private static final int NUMBER_OF_ZEROES = 3;
+	
+	/*
+	 * 	takes in string solution (string contains proof, clearTrans, hashedLastTrans, minerPubKey, validtrans?)
+	opens verTransList in reader
+	opens ledger in reader
+	saves each line as type Transaction in arraylist
+	save each part of solution in separate variables
+	truncate proof to first 3 characters
+	if truncated proof contains zeroes:
+		for verTransList loop:
+			for ledger loop:
+				if verTransList.get(i).gettransID == ledger.get(j).gettransID
+					ledger.get(j).setValid(false)
+					tempAmount += ledger.get(j).amount
+	 */
 
-	public VerifyProof(String solution) {
+	public static boolean verify(String solution) {
 		
-		BufferedReader in = new BufferedReader(new FileReader("ledger"));
-        String str;
-        while((str = in.readLine()) != null){
-            ledgerArr.add(str);
+		BufferedReader lin = new BufferedReader(new FileReader("ledger"));
+        String str1;
+        while((str1 = lin.readLine()) != null){
+        	Transaction trans = new Transaction(str1);
+            ledgerArr.add(trans);
         }
-        ledger = ledgerArr.toArray(new String[ledgerArr.size()]);
+        
+        BufferedReader vin = new BufferedReader(new FileReader("ledger"));
+        String str2;
+        while((str2 = vin.readLine()) != null){
+        	Transaction trans = new Transaction(str2);
+            ledgerArr.add(trans);
+        }
         
 		String trunc = proof.substring(0, 3);
 		String zeroes = String.format(String.format("%%%ds", NUMBER_OF_ZEROES), " ").replace(" ","0");

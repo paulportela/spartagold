@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
 
-public class ProofOfWork {
+public class ProofOfWork extends Thread {
 	
 	private List<String> ledgerArr = new ArrayList<String>();
 	private String[] ledger;
@@ -47,7 +47,7 @@ public class ProofOfWork {
 		isValid = transInfoArray[5];
 	}
 	
-	public void findProof() throws UnsupportedEncodingException, Exception {
+	public String findProof() throws UnsupportedEncodingException, Exception {
 
 		int randomNum = 1 + (int)(Math.random()*10); 
 		StringBuffer buffer = new StringBuffer();
@@ -78,7 +78,7 @@ public class ProofOfWork {
 		//check to see if first positions are zeroes
 		String zeroes = String.format(String.format("%%%ds", NUMBER_OF_ZEROES), " ").replace(" ","0");
 		if (trunc.toLowerCase().contains(zeroes)) {
-			//TODO: broadcast FOUNDSOLUTION containing proof|cleartrans|hashedLastTrans|miner's pub key|validtrans
+			return proof + "\t" + clearTrans + "\t" + hashedLastTrans + "\t" + getMyPubKey + "\t" + validtrans; //validtrans = list of ids
 		}
 	}
 	

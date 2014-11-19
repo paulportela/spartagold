@@ -29,7 +29,7 @@ public class Transaction {
 	
 	public String getReceiverPubKey() { return receiverPubKey; }
 	
-	public boolean getValid() { return isValid; }
+	public boolean isValid() { return isValid; }
 	
 	public String getSenderPubKey() { return senderPubKey; }
 	

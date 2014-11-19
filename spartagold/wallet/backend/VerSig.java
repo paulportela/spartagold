@@ -39,7 +39,7 @@ class VerSig {
 
 	private boolean verifies = false;
 	
-    public VerSig (String pubKeyFile, String sigFile, String msg) {
+    public VerSig (File pubKeyFile, File signedTransaction, String clearTrans) {
 
         /* Verify a DSA signature */
     	
@@ -58,7 +58,7 @@ class VerSig {
             PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
 
             /* input the signature bytes */
-            FileInputStream sigfis = new FileInputStream(sigFile);
+            FileInputStream sigfis = new FileInputStream(signedTransaction);
             byte[] sigToVerify = new byte[sigfis.available()]; 
             sigfis.read(sigToVerify );
 
@@ -70,7 +70,7 @@ class VerSig {
 
             /* Update and verify the data */
 
-            FileInputStream datafis = new FileInputStream(msg);
+            FileInputStream datafis = new FileInputStream(clearTrans);
             BufferedInputStream bufin = new BufferedInputStream(datafis);
 
             byte[] buffer = new byte[1024];

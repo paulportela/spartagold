@@ -6,8 +6,10 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class SignTransaction {
 	
+	private String signature;
+	
 	//TODO: change to take String parameter
-	public SignTransaction(File transaction) {
+	public SignTransaction(String clearTrans) {
 		/* Generate a DSA signature */
 		try {
 			/* Create a Signature object and initialize it with the private key */
@@ -29,7 +31,7 @@ public class SignTransaction {
 
 			/* Update and sign the data */
 
-			FileInputStream fis = new FileInputStream(transaction);
+			FileInputStream fis = new FileInputStream(clearTrans);
 			BufferedInputStream bufin = new BufferedInputStream(fis);
 			byte[] buffer = new byte[1024];
 			int len;
@@ -45,16 +47,13 @@ public class SignTransaction {
 
 			byte[] realSig = dsa.sign();
 
-
-			/* Save the signature in a file */
-			FileOutputStream sigfos = new FileOutputStream("signature");
-			sigfos.write(realSig);
-
-			sigfos.close();
+			//TODO: change realSig into String
 
 		}
 		catch (Exception e) {
 			System.err.println("Caught exception " + e.toString());
 		}
 	}
+	
+	public String getSignature() { return signature; }
 }

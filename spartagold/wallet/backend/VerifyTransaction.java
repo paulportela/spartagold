@@ -1,35 +1,75 @@
 package spartagold.wallet.backend;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 public class VerifyTransaction {
 
-	private String trans;
+	private List<Transaction> ledgerArr = new ArrayList<Transaction>();
+	private Transaction transaction;
 	private String senderPubKey;
 	private String signedClearTrans;
 	private String clearTrans;
-	private String hashID;
 	private int amount;
-	private String receiverPubKey;
-	private String isValid;
 	
-	public VerifyTransaction(String transaction) {
+	/*
+	 * 	takes Transaction type transaction
+	used to verify every transaction received
+	-needs to always listen or something, adds to list after each verification
+	once verified, add to a list of verified transactions verTransList (for loop described below)
+	max cap on verTransList = ?
+	call getSenderPubKey, getReceiverPubKey, getSignedClearTrans, getClearTrans
+	use senderPubKey on getSignedClearTrans, compare to clearTrans
+	verify for loop:
+		take each line of ledger, turn it into Transaction type
+		if this.senderPubKey == ledger.receiverPubKey && ledger.isValid == true
+			tempAmount += ledger.amount
+			add to verTransList
+	 */
+	
+	public VerifyTransaction(Transaction transaction) {
 		
-		trans = transaction;
-		String[] transInfoArray = trans.split("\t");
-		signedClearTrans = transInfoArray[0];
-		senderPubKey = transInfoArray[1];
-		hashID = transInfoArray[2];
-		amount = Integer.parseInt(transInfoArray[3]);
-		receiverPubKey = transInfoArray[4];
-		isValid = transInfoArray[5];
-		clearTrans = hashID + "\t" + amount + "\t" + receiverPubKey + "\t" + isValid;
+		this.transaction = transaction;
+		senderPubKey = transaction.getSenderPubKey();
+		signedClearTrans = transaction.getSignedClearTrans();
+		clearTrans = transaction.getClearTrans();
+		amount = transaction.getAmount();
+		
+		//TODO: check length of verTransList, if >=10, do not add more
 	}
 	
-	public void verify() throws Exception {
+	public boolean verify() throws Exception {
 		
-		VerSig ver = new VerSig(senderPubKey, signedClearTrans, clearTrans);
+		FileInputStream pubKeyfis = new FileInputStream("publickey");
+        
+		VerSig ver = new VerSig(pubKeyfis, signedClearTrans, clearTrans);
+		
 		if (ver.isVerified()) {
-			//TODO: read each line on ledger, if valid & senderPubKey=pubKey, tempamount+=line.amount. if tempamount>=amount, add to verTransList
-			
-		}
+			int tempAmount = 0;
+			BufferedReader in = new BufferedReader(new FileReader("ledger"));
+	        String str;
+	        while((str = in.readLine()) != null){
+	        	Transaction trans = new Transaction(str);
+	            ledgerArr.add(trans);
+	        }
+	        for (int i = 0; i < ledgerArr.size(); i++) {
+	        	if (senderPubKey == ledgerArr.get(i).getReceiverPubKey() && ledgerArr.get(i).isValid()) {
+	        		tempAmount += ledgerArr.get(i).getAmount();
+	        		BufferedWriter out = new BufferedWriter(new FileWriter("verTransList", true));
+		            out.append(clearTrans + "\r\n");
+		            out.close();
+	        	}
+	        	if (tempAmount >= amount) {
+	        		i = ledgerArr.size();
+	        	}
+	        }
+	        
+	        return true;
+		} else return false;
 	}
 }

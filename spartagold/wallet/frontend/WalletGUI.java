@@ -3,6 +3,7 @@ package spartagold.wallet.frontend;
 import java.awt.*;
 
 import javax.swing.*;
+import javax.xml.bind.DatatypeConverter;
 
 import spartagold.framework.PeerInfo;
 import spartagold.wallet.backend.GenKeys;
@@ -14,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.net.URL;
+import java.security.MessageDigest;
 
 public class WalletGUI {
     
@@ -28,6 +30,7 @@ public class WalletGUI {
 	private String[] transactionColumns = {"Date", "Address", "Amount"};
 	private SpartaGoldNode peer;
 	private boolean isMining = false;
+	private String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 	
 	/**
 	 * Launch the application.
@@ -39,8 +42,8 @@ public class WalletGUI {
 			public void run() {
 				try {
 					myIpAddress = getIpAddress();
-					boolean checkPubKey = new File("", "publickey.txt").exists();
-					boolean checkPrivKey = new File("", "privatekey.txt").exists();
+					boolean checkPubKey = new File("", "publickey").exists();
+					boolean checkPrivKey = new File("", "privatekey").exists();
 					if (!checkPubKey && !checkPrivKey) {
 						GenKeys keygen = new GenKeys();
 					}
@@ -112,8 +115,12 @@ public class WalletGUI {
 				while(isMining) {
 					//TODO: take top from validTransList and put into proof of work
 					//TODO: set as separate thread so cancel button works during while loop
-					ProofOfWork mine = new ProofOfWork(transaction);
-					mine.findProof();
+					ProofOfWork mine = new ProofOfWork(string clearTrans));
+					String s = mine.findProof();
+					String msgdata = s;
+					for (String pid : peer.getPeerKeys()) {
+						peer.sendToPeer(pid, SpartaGoldNode.FOUNDSOLUTION, msgdata, false);
+					}
 				}
 			}
 		});
@@ -184,10 +191,23 @@ public class WalletGUI {
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (tfAmount.getText() != "" && tfAddress.getText()!= ""){
+					//TODO: sign clearTrans
 					
-					//TODO: broadcast message here
+					int randomNum = 1 + (int)(Math.random()*10); 
+					StringBuffer buffer = new StringBuffer();
+					int charactersLength = characters.length();
+					for (int i = 0; i < randomNum; i++) {
+						double index = Math.random() * charactersLength;
+						buffer.append(characters.charAt((int) index));
+					}
+					String transID = buffer.toString();
 					
-					
+					String clearTrans = transID + "\t" + tfAmount.getText() + "\t" + tfAddress.getText() + "\t" + true;
+					SignTransaction sign = new SignTransaction(clearTrans);
+					String msgdata = sign.getSignature() + "\t" + getMyPubKey + "\t" + clearTrans;
+					for (String pid : peer.getPeerKeys()) {
+						peer.sendToPeer(pid, SpartaGoldNode.TRANSACTION, msgdata, false);
+					}
 				}
 				tfAmount.setText("");
 				tfAddress.setText("");
