@@ -198,7 +198,6 @@ public class Node
 	 */
 	public ServerSocket makeServerSocket(int port, int backlog) throws IOException 
 	{
-		System.out.println("---------->" + port);
 		ServerSocket s = new ServerSocket(port, backlog);
 		s.setReuseAddress(true);
 		return s;
@@ -246,19 +245,14 @@ public class Node
 	public List<PeerMessage> connectAndSend(PeerInfo pd, String msgtype, String msgdata, boolean waitreply) 
 	{
 		List<PeerMessage> msgreply = new ArrayList<PeerMessage>();
-		System.out.println("contacting...");
 		try 
 		{
 			PeerConnection peerconn = new PeerConnection(pd);
-			System.out.println("Created connection with " + pd.getHost());
 			PeerMessage tosend = new PeerMessage(msgtype, msgdata);
-			System.out.println("Created message");
 			peerconn.sendData(tosend);
-			System.out.println("Sent message");
 			LoggerUtil.getLogger().fine("Sent " + tosend + "/" + peerconn);
 			if (waitreply) 
 			{
-				System.out.println("Waiting for reply...");
 				PeerMessage onereply = peerconn.recvData();
 				while (onereply != null) 
 				{
@@ -423,11 +417,6 @@ public class Node
 	public int getPort() 
 	{
 		return myInfo.getPort();
-	}
-	
-	public ArrayList<PeerInfo> getAllKnownPeers()
-	{
-		return new ArrayList<PeerInfo>(peers.values());
 	}
 
 }

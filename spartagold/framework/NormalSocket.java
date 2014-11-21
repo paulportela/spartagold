@@ -5,6 +5,8 @@ package spartagold.framework;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -22,6 +24,9 @@ public class NormalSocket implements SocketInterface {
 	private Socket s;
 	private InputStream is;
 	private OutputStream os;
+	
+	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
 	
 	
 	/**
@@ -48,7 +53,11 @@ public class NormalSocket implements SocketInterface {
 	{
 		s = socket;
 		is = s.getInputStream();
-		os = s.getOutputStream();		
+		os = s.getOutputStream();	
+		
+		oos = new ObjectOutputStream(s.getOutputStream());
+		ois = new ObjectInputStream(s.getInputStream());
+		
 	}
 	
 	
@@ -81,6 +90,27 @@ public class NormalSocket implements SocketInterface {
 	public void write(byte[] b) throws IOException {
 		os.write(b);
 		os.flush();
+	}
+	
+	public void writeObject(Object ob) throws IOException
+	{
+		oos.writeObject(ob);
+	}
+
+
+	@Override
+	public Object readObject() throws IOException
+	{
+		try
+		{
+			return ois.readObject();
+		} 
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
+		
 	}
 
 }

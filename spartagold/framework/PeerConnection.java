@@ -1,8 +1,5 @@
 package spartagold.framework;
 
-
-
-
 import java.io.IOException;
 import java.net.UnknownHostException;
 
@@ -10,75 +7,78 @@ import java.net.UnknownHostException;
 //import peerbase.socket.SocketInterface;
 
 /**
- * Encapsulates a socket connection to a peer, providing simple, reliable
- * send and receive functionality. All data sent to a peer through this
- * class must be formatted as a PeerMessage object.
+ * Encapsulates a socket connection to a peer, providing simple, reliable send
+ * and receive functionality. All data sent to a peer through this class must be
+ * formatted as a PeerMessage object.
  * 
  * @author Nadeem Abdul Hamid
- *
+ * 
  */
-public class PeerConnection {
+public class PeerConnection
+{
 
 	private PeerInfo pd;
 	private SocketInterface s;
-	
+
 	/**
 	 * Opens a new connection to the specified peer.
 	 * 
-	 * @param info the peer node to connect to
-	 * @throws IOException if an I/O error occurs
+	 * @param info
+	 *            the peer node to connect to
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 * @throws UnknownHostException
 	 */
-	public PeerConnection(PeerInfo info) throws IOException, UnknownHostException 
+	public PeerConnection(PeerInfo info) throws IOException,
+			UnknownHostException
 	{
 		pd = info;
-		s = SocketFactory.getSocketFactory().makeSocket(pd.getHost(), pd.getPort());
-		System.out.println("Created connection");
+		s = SocketFactory.getSocketFactory().makeSocket(pd.getHost(),
+				pd.getPort());
 	}
-	
-	
+
 	/**
-	 * Constructs a connection for which a socket has already been
-	 * opened.
+	 * Constructs a connection for which a socket has already been opened.
 	 * 
 	 * @param info
 	 * @param socket
 	 */
-	public PeerConnection(PeerInfo info, SocketInterface socket) {
+	public PeerConnection(PeerInfo info, SocketInterface socket)
+	{
 		pd = info;
 		s = socket;
 	}
-	
-	
+
 	/**
 	 * Sends a PeerMessage to the connected peer.
-	 * @param msg the message object to send
+	 * 
+	 * @param msg
+	 *            the message object to send
 	 */
-	public void sendData(PeerMessage msg) 
+	public void sendData(PeerMessage msg)
 	{
-		try 
+		try
 		{
 			s.write(msg.toBytes());
-		}
-		catch (IOException e) 
+		} catch (IOException e)
 		{
 			LoggerUtil.getLogger().warning("Error sending message: " + e);
 		}
 	}
-	
-	
+
 	/**
 	 * Receives a PeerMessage from the connected peer.
+	 * 
 	 * @return the message object received, or null if error
 	 */
-	public PeerMessage recvData() 
+	public PeerMessage recvData()
 	{
-		try 
+		try
 		{
 			PeerMessage msg = new PeerMessage(s);
 			return msg;
-		}
-		catch (IOException e) 
+		} 
+		catch (IOException e)
 		{
 			// it is normal for EOF to occur if there is no more replies coming
 			// back from this connection.
@@ -89,30 +89,45 @@ public class PeerConnection {
 			return null;
 		}
 	}
-	
-	
+
+	public void sendObject(Object ob)
+	{
+		try
+		{
+			s.writeObject(ob);
+		} 
+		catch (IOException e)
+		{
+			LoggerUtil.getLogger().warning("Error sending object: " + e);
+		}
+	}
+
 	/**
 	 * Closes the peer connection.
 	 */
-	public void close() {
-		if (s != null) {
-			try {
+	public void close()
+	{
+		if (s != null)
+		{
+			try
+			{
 				s.close();
-			} catch (IOException e) {
+			} catch (IOException e)
+			{
 				LoggerUtil.getLogger().warning("Error closing: " + e);
 			}
 			s = null;
 		}
 	}
-	
-	
-	public PeerInfo getPeerInfo() {
+
+	public PeerInfo getPeerInfo()
+	{
 		return pd;
 	}
-	
-	
-	public String toString() {
+
+	public String toString()
+	{
 		return "PeerConnection[" + pd + "]";
 	}
-	
+
 }

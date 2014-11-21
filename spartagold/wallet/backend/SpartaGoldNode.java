@@ -1,10 +1,16 @@
 package spartagold.wallet.backend;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Hashtable;
 import java.util.List;
+
 
 import spartagold.framework.HandlerInterface;
 import spartagold.framework.LoggerUtil;
@@ -19,7 +25,7 @@ import spartagold.framework.RouterInterface;
 
 
 
-public class SpartaGoldNode extends Node //implements Serializable
+public class SpartaGoldNode extends Node implements Serializable
 {
 	//Message Types
 	public static final String INSERTPEER = "JOIN";
@@ -28,23 +34,29 @@ public class SpartaGoldNode extends Node //implements Serializable
 	public static final String PEERQUIT = "QUIT";
 	public static final String FOUNDSOLUTION = "HSOL";
 	public static final String TRANSACTION = "TRAN";
-	public static final String SENDSIMPLEMESSAGE = "SEND";
+	public static final String LEDGERGET = "LEDG";
+	
+	public static final String FILEGET = "FGET";
 	
 	public static final String REPLY = "REPL";
 	public static final String ERROR = "ERRO";
 	
+	private boolean mining;
 	
 	private Hashtable<String, String> transactions;
-	private Hashtable<String, String> ledger;
+	private BlockChain ledger;
+	private Hashtable<String,String> files;
 	
 	//Zeroes required for proof-work solution
 	private static final int NUMOFZEROES = 4;
+	private static final int REWARDAMOUNT = 5;
 	
 	public SpartaGoldNode(int maxPeers, PeerInfo myInfo)
 	{
 		super(maxPeers, myInfo);
 		transactions = new Hashtable<String,String>();
-		ledger = new Hashtable<String, String>();
+		ledger = new BlockChain();
+		files = new Hashtable<String, String>();
 		
 		this.addRouter(new Router(this));
 		
@@ -55,6 +67,9 @@ public class SpartaGoldNode extends Node //implements Serializable
 		this.addHandler(LISTPEER, new ListHandler(this));
 		this.addHandler(FOUNDSOLUTION, new SolutionFoundHandler(this));
 		this.addHandler(TRANSACTION, new TransactionHandler(this));
+		this.addHandler(LEDGERGET, new LedgerHandler(this));
+		
+		this.addHandler(FILEGET, new FileGetHandler(this));
 		
 	}
 	
@@ -103,24 +118,6 @@ public class SpartaGoldNode extends Node //implements Serializable
 		}
 	}
 	
-	/**
-	 * Broadcast Message
-	 */
-	public void broadcastMessage(String messageType, String messageData, boolean waitForReply)
-	{
-		if(this.getAllKnownPeers().isEmpty())
-		{
-			//No peers to send to
-			return;
-		}
-		else
-		{
-			for(PeerInfo pd: this.getAllKnownPeers())
-			{
-				this.connectAndSend(pd, messageData, messageData, waitForReply);
-			}
-		}
-	}
 	
 	
 	private class JoinHandler implements HandlerInterface
@@ -278,14 +275,15 @@ public class SpartaGoldNode extends Node //implements Serializable
 		
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
 		{
-			boolean solution = verifySolution(msg.getMsgData());
+			boolean solution = false; //verifySolution("");
 			if(!solution)
 			{
 				peerconn.sendData(new PeerMessage(ERROR, "Not a solution"));
 			}
 			else
 			{
-				
+				//check transaction and solution
+				"s".split("|");
 			}
 		}
 		
@@ -299,6 +297,7 @@ public class SpartaGoldNode extends Node //implements Serializable
 		{
 			//Hash verifier
 			String zeroes = String.format(String.format("%%%ds", NUMOFZEROES), " ").replace(" ","0");
+			
 			return true;
 		}
 	}
@@ -320,11 +319,66 @@ public class SpartaGoldNode extends Node //implements Serializable
 			transactions.put(peerconn.getPeerInfo().getId(), msg.getMsgData());
 			
 			//Sending a broadcast message to everybody in the list of peers.
-			for (PeerInfo pd : peer.getAllKnownPeers()) 
+			for (String key : peer.getPeerKeys()) 
 			{
-				peer.connectAndSend(pd, TRANSACTION, msg.getMsgData(), false);
+				peer.connectAndSend(peer.getPeer(key), TRANSACTION, msg.getMsgData(), false);
 			}
 			
+		}
+	}
+	
+	/* msg syntax: FGET file-name */
+	private class FileGetHandler implements HandlerInterface 
+	{
+		@SuppressWarnings("unused")
+		private Node peer;
+		
+		public FileGetHandler(Node peer) 
+		{ 
+			this.peer = peer; 
+		}
+		
+		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
+		{
+			String filename = msg.getMsgData().trim();
+			if (!files.containsKey(filename))
+			{
+				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "file not found " + filename));
+				return;
+			}
+			
+			byte[] filedata = null;
+			try 
+			{
+				FileInputStream infile = new FileInputStream(filename);
+				int len = infile.available();
+				filedata = new byte[len];
+				infile.read(filedata);
+				infile.close();
+			}
+			catch (IOException e) 
+			{
+				LoggerUtil.getLogger().info("Fget: error reading file: " + e);
+				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "error reading file " + filename));
+				return;
+			}
+			
+			peerconn.sendData(new PeerMessage(REPLY, filedata));
+		}
+	}
+	
+	private class LedgerHandler implements HandlerInterface 
+	{
+		private Node peer;
+		
+		public LedgerHandler(Node peer) 
+		{ 
+			this.peer = peer;
+		}
+		
+		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
+		{
+			//Needs Implementing!
 		}
 	}
 }

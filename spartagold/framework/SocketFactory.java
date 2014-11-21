@@ -22,7 +22,6 @@ public abstract class SocketFactory
 	
 	public static SocketFactory getSocketFactory() 
 	{
-		System.out.println("factory");
 		return currentFactory;
 	}
 	
