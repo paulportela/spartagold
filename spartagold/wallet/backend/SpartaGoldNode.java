@@ -44,7 +44,6 @@ public class SpartaGoldNode extends Node implements Serializable
 	private boolean mining;
 	
 	private Hashtable<String, String> transactions;
-	private BlockChain ledger;
 	private Hashtable<String,String> files;
 	
 	//Zeroes required for proof-work solution
@@ -55,7 +54,6 @@ public class SpartaGoldNode extends Node implements Serializable
 	{
 		super(maxPeers, myInfo);
 		transactions = new Hashtable<String,String>();
-		ledger = new BlockChain();
 		files = new Hashtable<String, String>();
 		
 		this.addRouter(new Router(this));
