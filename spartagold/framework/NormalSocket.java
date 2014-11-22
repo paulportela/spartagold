@@ -40,7 +40,6 @@ public class NormalSocket implements SocketInterface {
 	public NormalSocket(String host, int port) throws IOException, UnknownHostException 
 	{	
 		this(new Socket(host, port));
-		System.out.println("socket created");
 	}
 	
 	

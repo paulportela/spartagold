@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import spartagold.framework.PeerConnection;
 import spartagold.framework.PeerInfo;
 import spartagold.framework.PeerMessage;
 import spartagold.framework.RouterInterface;
+import spartagold.framework.SerializationUtils;
 
 
 
@@ -35,16 +37,17 @@ public class SpartaGoldNode extends Node implements Serializable
 	public static final String FOUNDSOLUTION = "HSOL";
 	public static final String TRANSACTION = "TRAN";
 	public static final String LEDGERGET = "LEDG";
+	public static final String PERSON = "PERS";
 	
-	public static final String FILEGET = "FGET";
+	public Person person;
+	
 	
 	public static final String REPLY = "REPL";
 	public static final String ERROR = "ERRO";
 	
 	private boolean mining;
 	
-	private Hashtable<String, String> transactions;
-	private Hashtable<String,String> files;
+	private ArrayList<String> transactions;
 	
 	//Zeroes required for proof-work solution
 	private static final int NUMOFZEROES = 4;
@@ -53,8 +56,7 @@ public class SpartaGoldNode extends Node implements Serializable
 	public SpartaGoldNode(int maxPeers, PeerInfo myInfo)
 	{
 		super(maxPeers, myInfo);
-		transactions = new Hashtable<String,String>();
-		files = new Hashtable<String, String>();
+		transactions = new ArrayList<>();
 		
 		this.addRouter(new Router(this));
 		
@@ -64,10 +66,10 @@ public class SpartaGoldNode extends Node implements Serializable
 		this.addHandler(PEERQUIT, new QuitHandler(this));
 		this.addHandler(LISTPEER, new ListHandler(this));
 		this.addHandler(FOUNDSOLUTION, new SolutionFoundHandler(this));
-		this.addHandler(TRANSACTION, new TransactionHandler(this));
+//		this.addHandler(TRANSACTION, new TransactionHandler(this));
 		this.addHandler(LEDGERGET, new LedgerHandler(this));
 		
-		this.addHandler(FILEGET, new FileGetHandler(this));
+		this.addHandler(PERSON, new PersonHandler(this));
 		
 	}
 	
@@ -303,67 +305,67 @@ public class SpartaGoldNode extends Node implements Serializable
 	/**
 	 * Handles a received transaction message by broadcasting it to its known peers.
 	 */
-	private class TransactionHandler implements HandlerInterface 
-	{
-		private Node peer;
-		
-		public TransactionHandler(Node peer) 
-		{ 
-			this.peer = peer;
-		}
-		
-		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
-		{
-			transactions.put(peerconn.getPeerInfo().getId(), msg.getMsgData());
-			
-			//Sending a broadcast message to everybody in the list of peers.
-			for (String key : peer.getPeerKeys()) 
-			{
-				peer.connectAndSend(peer.getPeer(key), TRANSACTION, msg.getMsgData(), false);
-			}
-			
-		}
-	}
+//	private class TransactionHandler implements HandlerInterface 
+//	{
+//		private Node peer;
+//		
+//		public TransactionHandler(Node peer) 
+//		{ 
+//			this.peer = peer;
+//		}
+//		
+//		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
+//		{
+//			transactions.put(peerconn.getPeerInfo().getId(), msg.getMsgData());
+//			
+//			//Sending a broadcast message to everybody in the list of peers.
+//			for (String key : peer.getPeerKeys()) 
+//			{
+//				peer.connectAndSend(peer.getPeer(key), TRANSACTION, msg.getMsgData(), false);
+//			}
+//			
+//		}
+//	}
 	
-	/* msg syntax: FGET file-name */
-	private class FileGetHandler implements HandlerInterface 
-	{
-		@SuppressWarnings("unused")
-		private Node peer;
-		
-		public FileGetHandler(Node peer) 
-		{ 
-			this.peer = peer; 
-		}
-		
-		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
-		{
-			String filename = msg.getMsgData().trim();
-			if (!files.containsKey(filename))
-			{
-				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "file not found " + filename));
-				return;
-			}
-			
-			byte[] filedata = null;
-			try 
-			{
-				FileInputStream infile = new FileInputStream(filename);
-				int len = infile.available();
-				filedata = new byte[len];
-				infile.read(filedata);
-				infile.close();
-			}
-			catch (IOException e) 
-			{
-				LoggerUtil.getLogger().info("Fget: error reading file: " + e);
-				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "error reading file " + filename));
-				return;
-			}
-			
-			peerconn.sendData(new PeerMessage(REPLY, filedata));
-		}
-	}
+//	/* msg syntax: FGET file-name */
+//	private class FileGetHandler implements HandlerInterface 
+//	{
+//		@SuppressWarnings("unused")
+//		private Node peer;
+//		
+//		public FileGetHandler(Node peer) 
+//		{ 
+//			this.peer = peer; 
+//		}
+//		
+//		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
+//		{
+//			String filename = msg.getMsgData().trim();
+//			if (!files.containsKey(filename))
+//			{
+//				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "file not found " + filename));
+//				return;
+//			}
+//			
+//			byte[] filedata = null;
+//			try 
+//			{
+//				FileInputStream infile = new FileInputStream(filename);
+//				int len = infile.available();
+//				filedata = new byte[len];
+//				infile.read(filedata);
+//				infile.close();
+//			}
+//			catch (IOException e) 
+//			{
+//				LoggerUtil.getLogger().info("Fget: error reading file: " + e);
+//				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "error reading file " + filename));
+//				return;
+//			}
+//			
+//			peerconn.sendData(new PeerMessage(REPLY, filedata));
+//		}
+//	}
 	
 	private class LedgerHandler implements HandlerInterface 
 	{
@@ -377,6 +379,22 @@ public class SpartaGoldNode extends Node implements Serializable
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
 		{
 			//Needs Implementing!
+		}
+	}
+	
+	private class PersonHandler implements HandlerInterface 
+	{
+		private Node peer;
+		
+		public PersonHandler(Node peer) 
+		{ 
+			this.peer = peer;
+		}
+		
+		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
+		{
+			Person p = (Person) SerializationUtils.deserialize(msg.getMsgDataBytes());
+			System.out.println(p.getName());
 		}
 	}
 }

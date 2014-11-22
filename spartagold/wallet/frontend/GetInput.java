@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package spartagoldcli;
+package spartagold.wallet.frontend;
 import java.util.Scanner;
 /**
  *

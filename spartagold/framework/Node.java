@@ -52,15 +52,10 @@ public class Node
 			
 			PeerConnection peerconn = new PeerConnection(null, s);
 			PeerMessage peermsg = peerconn.recvData();
-			if (!handlers.containsKey(peermsg.getMsgType()))
-			{
-				LoggerUtil.getLogger().fine("Not handled: " + peermsg);
-			}
-			else 
-			{
-				LoggerUtil.getLogger().finer("Handling: " + peermsg);
-				handlers.get(peermsg.getMsgType()).handleMessage(peerconn, peermsg);
-			}
+			
+			LoggerUtil.getLogger().finer("Handling: " + peermsg);
+			handlers.get(peermsg.getMsgType()).handleMessage(peerconn, peermsg);
+			
 			LoggerUtil.getLogger().fine("Disconnecting incoming: " + peerconn);
 			// NOTE: log message should indicate null peerconn host
 			
@@ -232,6 +227,27 @@ public class Node
 	}
 
 
+	//================================================================================
+	public List<PeerMessage> connectAndSendObject(PeerInfo pd, String msgtype, Object objdata)
+	{
+		List<PeerMessage> msgreply = new ArrayList<PeerMessage>();
+		try 
+		{
+			byte[] data = SerializationUtils.serialize(objdata);
+			PeerConnection peerconn = new PeerConnection(pd);
+			PeerMessage tosend = new PeerMessage(msgtype, data);
+			peerconn.sendData(tosend);
+			LoggerUtil.getLogger().fine("Sent " + tosend + "/" + peerconn);
+			
+			peerconn.close();
+		}
+		catch (IOException e) 
+		{
+			LoggerUtil.getLogger().warning("Error: " + e + "/" + pd + "/" + msgtype);
+		}
+		return msgreply;
+	}
+	//================================================================================
 	/**
 	 * Connects to the specified peer and sends a message, optionally waiting
 	 * and returning any replies.
@@ -419,4 +435,8 @@ public class Node
 		return myInfo.getPort();
 	}
 
+	public ArrayList<PeerInfo> getAllPeers()
+	{
+		return new ArrayList<PeerInfo>(peers.values());
+	}
 }

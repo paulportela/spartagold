@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package spartagoldcli;
+package spartagold.wallet.frontend;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -28,7 +28,7 @@ public class SpartaGoldCLI {
         menu goldMenu = new menu();
         goldMenu.displayMenu();
     }
-    }
+}
 
 
 
