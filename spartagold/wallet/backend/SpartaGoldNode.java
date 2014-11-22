@@ -36,10 +36,10 @@ public class SpartaGoldNode extends Node implements Serializable
 	public static final String PEERQUIT = "QUIT";
 	public static final String FOUNDSOLUTION = "HSOL";
 	public static final String TRANSACTION = "TRAN";
-	public static final String LEDGERGET = "LEDG";
+	public static final String GETCHAIN = "CHIN";
 	public static final String PERSON = "PERS";
 	
-	public Person person;
+	//public Person person;
 	
 	
 	public static final String REPLY = "REPL";
@@ -47,7 +47,7 @@ public class SpartaGoldNode extends Node implements Serializable
 	
 	private boolean mining;
 	
-	private ArrayList<String> transactions;
+	private ArrayList<Transaction> transactions;
 	
 	//Zeroes required for proof-work solution
 	private static final int NUMOFZEROES = 4;
@@ -65,11 +65,12 @@ public class SpartaGoldNode extends Node implements Serializable
 		this.addHandler(PEERNAME, new NameHandler(this));
 		this.addHandler(PEERQUIT, new QuitHandler(this));
 		this.addHandler(LISTPEER, new ListHandler(this));
-		this.addHandler(FOUNDSOLUTION, new SolutionFoundHandler(this));
-//		this.addHandler(TRANSACTION, new TransactionHandler(this));
-		this.addHandler(LEDGERGET, new LedgerHandler(this));
 		
-		this.addHandler(PERSON, new PersonHandler(this));
+		this.addHandler(TRANSACTION, new TransactionHandler(this));
+		this.addHandler(FOUNDSOLUTION, new SolutionFoundHandler(this));
+		this.addHandler(GETCHAIN, new ChainHandler(this));
+		
+		//this.addHandler(PERSON, new PersonHandler(this));
 		
 	}
 	
@@ -243,24 +244,6 @@ public class SpartaGoldNode extends Node implements Serializable
 		}
 	}
 	
-	public static StringBuilder hash(String data) throws NoSuchAlgorithmException
-	{
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		md.update(data.getBytes());
-		byte[] bytes = md.digest();
-		StringBuilder binary = new StringBuilder();
-		for (byte b : bytes)
-		{
-		   int val = b;
-		   for (int i = 0; i < 8; i++)
-		   {
-		      binary.append((val & 128) == 0 ? 0 : 1);
-		      val <<= 1;
-		   }
-		}
-		return binary;
-	}
-	
 	/**
 	 * Handles a solution of the proof-of-work by verifying it.
 	 */
@@ -275,6 +258,10 @@ public class SpartaGoldNode extends Node implements Serializable
 		
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
 		{
+			Block b = (Block) SerializationUtils.deserialize(msg.getMsgDataBytes());
+			
+			//TODO validate block b by checking proof
+			
 			boolean solution = false; //verifySolution("");
 			if(!solution)
 			{
@@ -283,118 +270,71 @@ public class SpartaGoldNode extends Node implements Serializable
 			else
 			{
 				//check transaction and solution
-				"s".split("|");
+				
 			}
-		}
-		
-		/**
-		 * Hashes the message info with the answer to verify the solution.
-		 * @param answer the solution found
-		 * @return the boolean value
-		 * @throws UnsupportedEncodingException 
-		 */
-		public boolean verifySolution(String answer) throws UnsupportedEncodingException
-		{
-			//Hash verifier
-			String zeroes = String.format(String.format("%%%ds", NUMOFZEROES), " ").replace(" ","0");
-			
-			return true;
 		}
 	}
 	
-	/**
-	 * Handles a received transaction message by broadcasting it to its known peers.
-	 */
-//	private class TransactionHandler implements HandlerInterface 
+	private class TransactionHandler implements HandlerInterface 
+	{
+		private Node peer;
+		
+		public TransactionHandler(Node peer) 
+		{ 
+			this.peer = peer;
+		}
+		
+		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
+		{
+			
+		}
+	}
+	
+	
+	private class ChainHandler implements HandlerInterface 
+	{
+		private Node peer;
+		
+		public ChainHandler(Node peer) 
+		{ 
+			this.peer = peer;
+		}
+		
+		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
+		{
+			Transaction t = (Transaction) SerializationUtils.deserialize(msg.getMsgDataBytes());
+			
+			//TODO validate transaction object before
+			
+			if(!transactions.contains(t))
+			{
+				transactions.add(t);
+				for (PeerInfo pid : peer.getAllPeers()) 
+				{
+					peer.connectAndSendObject(pid, TRANSACTION, t);
+				}
+			}
+			else
+			{
+				peerconn.sendData(new PeerMessage(ERROR, "Transation couldn't get validated"));
+			}
+			
+		}
+	}
+	
+//	private class PersonHandler implements HandlerInterface 
 //	{
 //		private Node peer;
 //		
-//		public TransactionHandler(Node peer) 
+//		public PersonHandler(Node peer) 
 //		{ 
 //			this.peer = peer;
 //		}
 //		
 //		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
 //		{
-//			transactions.put(peerconn.getPeerInfo().getId(), msg.getMsgData());
-//			
-//			//Sending a broadcast message to everybody in the list of peers.
-//			for (String key : peer.getPeerKeys()) 
-//			{
-//				peer.connectAndSend(peer.getPeer(key), TRANSACTION, msg.getMsgData(), false);
-//			}
-//			
+//			Person p = (Person) SerializationUtils.deserialize(msg.getMsgDataBytes());
+//			System.out.println(p.getName());
 //		}
 //	}
-	
-//	/* msg syntax: FGET file-name */
-//	private class FileGetHandler implements HandlerInterface 
-//	{
-//		@SuppressWarnings("unused")
-//		private Node peer;
-//		
-//		public FileGetHandler(Node peer) 
-//		{ 
-//			this.peer = peer; 
-//		}
-//		
-//		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
-//		{
-//			String filename = msg.getMsgData().trim();
-//			if (!files.containsKey(filename))
-//			{
-//				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "file not found " + filename));
-//				return;
-//			}
-//			
-//			byte[] filedata = null;
-//			try 
-//			{
-//				FileInputStream infile = new FileInputStream(filename);
-//				int len = infile.available();
-//				filedata = new byte[len];
-//				infile.read(filedata);
-//				infile.close();
-//			}
-//			catch (IOException e) 
-//			{
-//				LoggerUtil.getLogger().info("Fget: error reading file: " + e);
-//				peerconn.sendData(new PeerMessage(ERROR, "Fget: " + "error reading file " + filename));
-//				return;
-//			}
-//			
-//			peerconn.sendData(new PeerMessage(REPLY, filedata));
-//		}
-//	}
-	
-	private class LedgerHandler implements HandlerInterface 
-	{
-		private Node peer;
-		
-		public LedgerHandler(Node peer) 
-		{ 
-			this.peer = peer;
-		}
-		
-		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
-		{
-			//Needs Implementing!
-		}
-	}
-	
-	private class PersonHandler implements HandlerInterface 
-	{
-		private Node peer;
-		
-		public PersonHandler(Node peer) 
-		{ 
-			this.peer = peer;
-		}
-		
-		public void handleMessage(PeerConnection peerconn, PeerMessage msg) 
-		{
-			Person p = (Person) SerializationUtils.deserialize(msg.getMsgDataBytes());
-			System.out.println(p.getName());
-		}
-	}
 }
