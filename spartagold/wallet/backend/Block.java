@@ -1,71 +1,45 @@
-package spartagold.wallet.backend;
+public class Block implements Serializable {
+    private String id;
+    private String solution;
+    private String minerPubKey;
+    private String previousBlockID;
+    private ArrayList<Transaction> transList;
 
-public class Block
-{
-	private int id;
-	private Transacation[] transactions;
-	private int difficulty;
-	private String solver;
-	private String previous;
-	
-	public Block(int id, Transacation[] transactions, int difficulty, String solver)
-	{
-		super();
-		this.id = id;
-		this.transactions = transactions;
-		this.difficulty = difficulty;
-		this.solver = solver;
-	}
-	
-	public int numberOfTransactions()
-	{
-		return transactions.length;
-	}
+    private static final int REWARDAMOUNT = 5;
 
-	public int getId()
-	{
-		return id;
-	}
+    public Block(String solution, String minerId)
+    {
+        super();
+        this.id = UUID.randomUUID().toString();
+        this.solution = solution;
+        BufferedReader br = new BufferedReader(new FileReader(“pubkey”));
+        this.minerPubKey = br.readline();
+        br.close();
+        transList = new ArrayList<Transaction>();
+        transList.add(new Transaction(REWARDAMOUNT, minerPubKey));
+    }
 
-	public void setId(int id)
-	{
-		this.id = id;
-	}
+    public String getPreviousBlockID() { return previousBlockID; }
 
-	public Transacation[] getTransactions()
-	{
-		return transactions;
-	}
+    public void setPreviousBlockID(String previousBlockID) { this.previousBlockID = previousBlockID; }
 
-	public void setTransactions(Transacation[] transactions)
-	{
-		this.transactions = transactions;
-	}
+    public String getMinerPubKey() { return minerPubKey; }
 
-	public int getDifficulty()
-	{
-		return difficulty;
-	}
+    public void setMinerPubKey(String minerPubKey) { this.minerPubKey = minerPubKey; }
 
-	public void setDifficulty(int difficulty)
-	{
-		this.difficulty = difficulty;
-	}
+    public String getSolution() { return solution; }
 
-	public String getSolver()
-	{
-		return solver;
-	}
+    public void setSolution(String solution) { this.solution = solution; }
 
-	public void setSolver(String solver)
-	{
-		this.solver = solver;
-	}
-	
-	public void setPreviousBlock(Block b)
-	{
-		//This should be the hash of the previous block not string
-		previous = b.toString();
-	}
-	
+    public String getId() { return id; }
+
+    public ArrayList<Transaction> getTransactions() { return transList; }
+
+    public void addTransaction(Transaction t) { transList.add(t); }
+    @Override
+    public String toString() {
+        return "Block [id=" + id + ", solution=" + solution + ", minerPubKey="
+        + minerId + ", previousBlockID=" + previousBlockID + ", trans="
+        + trans + "]";
+    }
 }

@@ -191,22 +191,10 @@ public class WalletGUI {
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (tfAmount.getText() != "" && tfAddress.getText()!= ""){
-					//TODO: sign clearTrans
-					
-					int randomNum = 1 + (int)(Math.random()*10); 
-					StringBuffer buffer = new StringBuffer();
-					int charactersLength = characters.length();
-					for (int i = 0; i < randomNum; i++) {
-						double index = Math.random() * charactersLength;
-						buffer.append(characters.charAt((int) index));
-					}
-					String transID = buffer.toString();
-					
-					String clearTrans = transID + "\t" + tfAmount.getText() + "\t" + tfAddress.getText() + "\t" + true;
-					SignTransaction sign = new SignTransaction(clearTrans);
-					String msgdata = sign.getSignature() + "\t" + getMyPubKey + "\t" + clearTrans;
+
+					Transaction msgdata = new Transaction(tfAddress.getText(), Double.parseDouble(tfAmount.getText()));
 					for (String pid : peer.getPeerKeys()) {
-						peer.sendToPeer(pid, SpartaGoldNode.TRANSACTION, msgdata, false);
+						peer.connectAndSendObject(pid, SpartaGoldNode.TRANSACTION, msgdata, false);
 					}
 				}
 				tfAmount.setText("");

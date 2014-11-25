@@ -10,7 +10,7 @@ public class GenKeys {
 		try {
 			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
 			
-			SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+			SecureRandom random = SecureRandom.getInstance("SHA256PRNG", "SUN");
 			keyGen.initialize(1024, random);
 			
 			KeyPair pair = keyGen.generateKeyPair();

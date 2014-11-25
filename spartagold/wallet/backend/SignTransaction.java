@@ -6,10 +6,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class SignTransaction {
 	
-	private String signature;
-	
-	//TODO: change to take String parameter
-	public SignTransaction(String clearTrans) {
+	public static String sign(String pubKeyandAmount) {
 		/* Generate a DSA signature */
 		try {
 			/* Create a Signature object and initialize it with the private key */
@@ -48,12 +45,11 @@ public class SignTransaction {
 			byte[] realSig = dsa.sign();
 
 			//TODO: change realSig into String
+			return string of public key
 
 		}
 		catch (Exception e) {
 			System.err.println("Caught exception " + e.toString());
 		}
 	}
-	
-	public String getSignature() { return signature; }
 }
