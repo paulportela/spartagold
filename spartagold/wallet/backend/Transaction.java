@@ -1,16 +1,19 @@
 package spartagold.wallet.backend;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class Transaction implements Serializable
 {
-	private int id;
+	private String id;
 	private double amount;
+	private String receiver;
 	
-	public Transaction(int id, double amount)
+	public Transaction(double amount, String receiver)
 	{
-		this.setId(id);
-		this.setAmount(amount);
+		this.id = UUID.randomUUID().toString();;
+		this.amount = amount;
+		this.receiver = receiver;
 	}
 
 	public double getAmount()
@@ -23,14 +26,9 @@ public class Transaction implements Serializable
 		this.amount = amount;
 	}
 
-	public int getId()
+	public String getId()
 	{
 		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
 	}
 
 	@Override

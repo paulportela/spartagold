@@ -10,14 +10,25 @@ import java.security.NoSuchAlgorithmException;
 
 public class Validator
 {
+	
+	private static final int NUMOFZEROES = 4;
+	
+	
 	/**
 	 * Validate a block
 	 * @param b
 	 * @return
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public boolean validateBlock(Block b)
+	public static boolean validateProofOfBlock(Block b) throws NoSuchAlgorithmException
 	{
-		//TODO validate Block by rehashing proof and transactions
+		String zeros = new String(new char[NUMOFZEROES]).replace("\0", "0");
+		String solution = b.getSolution();
+		String blockId = b.getId();
+		String hash = hash(solution + blockId).toString();
+		
+		if(zeros.equals(hash))
+			return true;
 		return false;
 	}
 	
@@ -27,9 +38,10 @@ public class Validator
 	 * @param chain
 	 * @return
 	 */
-	public boolean validateTransaction(Transaction trans, BlockChain chain)
+	public static boolean validateTransaction(Transaction trans, BlockChain chain)
 	{
 		//TODO validate trans by using chain
+		
 		return false;
 	}
 	

@@ -1,31 +1,39 @@
 package spartagold.wallet.backend;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.UUID;
 
-public class Block
+public class Block implements Serializable
 {
-	private int id;
+	private String id;
 	private String solution;
+	
+	//TODO change miderId to something else
 	private String minerId;
-	private Block previousBlockID;
+	
+	private String previousBlockID;
 	private ArrayList<Transaction> trans;
 	
-	public Block(int id, String solution, String minerId)
+	private static final int REWARDAMOUNT = 5;
+	
+	public Block(String solution, String minerId)
 	{
 		super();
-		this.setId(id);
-		this.setSolution(solution);
-		this.setMinerId(minerId);
-		this.setPreviousBlockID(previousBlockID);
+		this.id = UUID.randomUUID().toString();
+		this.solution = solution;
+		this.minerId = UUID.randomUUID().toString();
+		
 		trans = new ArrayList<Transaction>();
+		trans.add(new Transaction(REWARDAMOUNT, minerId));
 	}
 
-	public Block getPreviousBlockID()
+	public String getPreviousBlockID()
 	{
 		return previousBlockID;
 	}
 
-	public void setPreviousBlockID(Block previousBlockID)
+	public void setPreviousBlockID(String previousBlockID)
 	{
 		this.previousBlockID = previousBlockID;
 	}
@@ -50,14 +58,9 @@ public class Block
 		this.solution = solution;
 	}
 
-	public int getId()
+	public String getId()
 	{
 		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
 	}
 
 	public ArrayList<Transaction> getTransactions()

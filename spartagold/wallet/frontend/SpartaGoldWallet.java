@@ -1,4 +1,4 @@
-package spartagold.wallet.backend;
+package spartagold.wallet.frontend;
 
 
 import java.awt.*;
@@ -13,6 +13,8 @@ import javax.swing.*;
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.PeerInfo;
 import spartagold.framework.SimplePingStabilizer;
+import spartagold.wallet.backend.Person;
+import spartagold.wallet.backend.SpartaGoldNode;
 
 
 @SuppressWarnings("serial")

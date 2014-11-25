@@ -1,15 +1,21 @@
 package spartagold.wallet.backend;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class BlockChain
+public class BlockChain implements Serializable
 {
 	private ArrayList<Block> chain;
 
-	public BlockChain(ArrayList<Block> chain)
+	public BlockChain()
 	{
 		super();
-		this.setChain(chain);
+		chain = new ArrayList<Block>();
+	}
+	
+	public void addBlock(Block b)
+	{
+		chain.add(b);
 	}
 	
 	public int getChainSize()
