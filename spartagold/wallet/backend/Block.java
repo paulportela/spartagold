@@ -1,71 +1,85 @@
 package spartagold.wallet.backend;
 
-public class Block
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.UUID;
+
+@SuppressWarnings("serial")
+public class Block implements Serializable
 {
-	private int id;
-	private Transacation[] transactions;
-	private int difficulty;
-	private String solver;
-	private String previous;
-	
-	public Block(int id, Transacation[] transactions, int difficulty, String solver)
+	private String id;
+	private String solution;
+	private String minerPubKey;
+	private String previousBlockID;
+	private ArrayList<Transaction> transactionList;
+
+	private static final double REWARDAMOUNT = 5;
+
+	public Block() throws IOException
 	{
 		super();
-		this.id = id;
-		this.transactions = transactions;
-		this.difficulty = difficulty;
-		this.solver = solver;
-	}
-	
-	public int numberOfTransactions()
-	{
-		return transactions.length;
+		id = UUID.randomUUID().toString();
+		BufferedReader br = new BufferedReader(new FileReader("publickey.txt"));
+		minerPubKey = br.readLine();
+		br.close();
+		transactionList = new ArrayList<Transaction>();
+		transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT));
+		System.out.println("New block created - ID: " + id);
 	}
 
-	public int getId()
+	public String getPreviousBlockID()
+	{
+		return previousBlockID;
+	}
+
+	public void setPreviousBlockID(String previousBlockID)
+	{
+		this.previousBlockID = previousBlockID;
+	}
+
+	public String getMinerPubKey()
+	{
+		return minerPubKey;
+	}
+
+	public void setMinerPubKey(String minerPubKey)
+	{
+		this.minerPubKey = minerPubKey;
+	}
+
+	public String getSolution()
+	{
+		return solution;
+	}
+
+	public void setSolution(String solution)
+	{
+		this.solution = solution;
+	}
+
+	public String getId()
 	{
 		return id;
 	}
 
-	public void setId(int id)
+	public ArrayList<Transaction> getTransactions()
 	{
-		this.id = id;
+		return transactionList;
 	}
 
-	public Transacation[] getTransactions()
+	public void addTransaction(Transaction t)
 	{
-		return transactions;
+		transactionList.add(t);
 	}
 
-	public void setTransactions(Transacation[] transactions)
+	@Override
+	public String toString()
 	{
-		this.transactions = transactions;
+		return "Block [id=" + id + ", minerPubKey=" + minerPubKey
+				+ ", previousBlockID=" + previousBlockID + ", trans="
+				+ transactionList + "]";
 	}
-
-	public int getDifficulty()
-	{
-		return difficulty;
-	}
-
-	public void setDifficulty(int difficulty)
-	{
-		this.difficulty = difficulty;
-	}
-
-	public String getSolver()
-	{
-		return solver;
-	}
-
-	public void setSolver(String solver)
-	{
-		this.solver = solver;
-	}
-	
-	public void setPreviousBlock(Block b)
-	{
-		//This should be the hash of the previous block not string
-		previous = b.toString();
-	}
-	
 }

@@ -14,6 +14,11 @@ import java.io.IOException;
  *
  */
 public interface SocketInterface {
+	
+	
+	public void writeObject(Object ob) throws IOException;
+	
+	public Object readObject() throws IOException;
 
 	/** Writes b.length bytes from the specified byte array to this 
 	 * socket connection. 

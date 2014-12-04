@@ -1,3 +1,4 @@
+
 package spartagold.wallet.frontend;
 
 

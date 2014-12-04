@@ -4,6 +4,7 @@ package spartagold.framework;
 
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.SerializationUtils;
 
 //import peerbase.socket.SocketFactory;
 //import peerbase.socket.SocketInterface;
@@ -52,15 +55,10 @@ public class Node
 			
 			PeerConnection peerconn = new PeerConnection(null, s);
 			PeerMessage peermsg = peerconn.recvData();
-			if (!handlers.containsKey(peermsg.getMsgType()))
-			{
-				LoggerUtil.getLogger().fine("Not handled: " + peermsg);
-			}
-			else 
-			{
-				LoggerUtil.getLogger().finer("Handling: " + peermsg);
-				handlers.get(peermsg.getMsgType()).handleMessage(peerconn, peermsg);
-			}
+			
+			LoggerUtil.getLogger().finer("Handling: " + peermsg);
+			handlers.get(peermsg.getMsgType()).handleMessage(peerconn, peermsg);
+			
 			LoggerUtil.getLogger().fine("Disconnecting incoming: " + peerconn);
 			// NOTE: log message should indicate null peerconn host
 			
@@ -160,6 +158,7 @@ public class Node
 		String host = "";
 		try 
 		{
+			@SuppressWarnings("resource")
 			Socket s = new Socket("www.google.com", 80);
 			host = s.getLocalAddress().getHostAddress();
 		}
@@ -198,7 +197,6 @@ public class Node
 	 */
 	public ServerSocket makeServerSocket(int port, int backlog) throws IOException 
 	{
-		System.out.println("---------->" + port);
 		ServerSocket s = new ServerSocket(port, backlog);
 		s.setReuseAddress(true);
 		return s;
@@ -233,6 +231,27 @@ public class Node
 	}
 
 
+	//================================================================================
+	public List<PeerMessage> connectAndSendObject(PeerInfo pd, String msgtype, Object objdata)
+	{
+		List<PeerMessage> msgreply = new ArrayList<PeerMessage>();
+		try 
+		{
+			byte[] data = SerializationUtils.serialize((Serializable) objdata);
+			PeerConnection peerconn = new PeerConnection(pd);
+			PeerMessage tosend = new PeerMessage(msgtype, data);
+			peerconn.sendData(tosend);
+			LoggerUtil.getLogger().fine("Sent " + tosend + "/" + peerconn);
+			
+			peerconn.close();
+		}
+		catch (IOException e) 
+		{
+			LoggerUtil.getLogger().warning("Error: " + e + "/" + pd + "/" + msgtype);
+		}
+		return msgreply;
+	}
+	//================================================================================
 	/**
 	 * Connects to the specified peer and sends a message, optionally waiting
 	 * and returning any replies.
@@ -246,19 +265,14 @@ public class Node
 	public List<PeerMessage> connectAndSend(PeerInfo pd, String msgtype, String msgdata, boolean waitreply) 
 	{
 		List<PeerMessage> msgreply = new ArrayList<PeerMessage>();
-		System.out.println("contacting...");
 		try 
 		{
 			PeerConnection peerconn = new PeerConnection(pd);
-			System.out.println("Created connection with " + pd.getHost());
 			PeerMessage tosend = new PeerMessage(msgtype, msgdata);
-			System.out.println("Created message");
 			peerconn.sendData(tosend);
-			System.out.println("Sent message");
 			LoggerUtil.getLogger().fine("Sent " + tosend + "/" + peerconn);
 			if (waitreply) 
 			{
-				System.out.println("Waiting for reply...");
 				PeerMessage onereply = peerconn.recvData();
 				while (onereply != null) 
 				{
@@ -424,10 +438,9 @@ public class Node
 	{
 		return myInfo.getPort();
 	}
-	
-	public ArrayList<PeerInfo> getAllKnownPeers()
+
+	public ArrayList<PeerInfo> getAllPeers()
 	{
 		return new ArrayList<PeerInfo>(peers.values());
 	}
-
 }

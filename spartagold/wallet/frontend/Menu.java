@@ -1,10 +1,6 @@
+
 package spartagold.wallet.frontend;
 
-
-/**
- *
- * @author mojiarmin
- */
 public class Menu
 {
 
@@ -17,8 +13,7 @@ public class Menu
     private static final int help = 4;
     private static final int EXIT = 5;
 
-    public Menu() 
-    {
+    public Menu() {
         screen = new Screen();
         getinput = new GetInput();
     }
