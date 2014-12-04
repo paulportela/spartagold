@@ -21,12 +21,13 @@ public class Block implements Serializable
 	public Block() throws IOException
 	{
 		super();
-		this.id = UUID.randomUUID().toString();
+		id = UUID.randomUUID().toString();
 		BufferedReader br = new BufferedReader(new FileReader("publickey.txt"));
 		minerPubKey = br.readLine();
 		br.close();
 		transactionList = new ArrayList<Transaction>();
 		transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT));
+		System.out.println("New block created - ID: " + id);
 	}
 
 	public String getPreviousBlockID()

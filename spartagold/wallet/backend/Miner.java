@@ -18,14 +18,17 @@ public class Miner implements Runnable
 		block = new Block();
 		block.addTransaction(t);
 		solution = "";
+		System.out.println("Miner object created.");
 	}
 
 	public void run()
 	{
 		try
 		{
+			System.out.println("Finding solution...");
 			solution = ProofOfWork.findProof(block.toString());
 			block.setSolution(solution);
+			System.out.println("Solution has been set in block.");
 		} 
 		catch (Exception e)
 		{

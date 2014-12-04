@@ -2,7 +2,9 @@ package spartagold.wallet.frontend;
 
 import java.awt.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+
 import spartagold.framework.PeerInfo;
 import spartagold.wallet.backend.GenKeys;
 import spartagold.wallet.backend.Miner;
@@ -11,6 +13,7 @@ import spartagold.wallet.backend.Transaction;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 
@@ -27,8 +30,6 @@ public class WalletGUI
 	private Object[][] previousTransactions = {};
 	private String[] transactionColumns = { "Date", "Address", "Amount" };
 	private SpartaGoldNode peer;
-	private boolean isMining = false;
-	private String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
 	/**
 	 * Launch the application.
@@ -44,12 +45,15 @@ public class WalletGUI
 				try
 				{
 					myIpAddress = getIpAddress();
-					boolean checkPubKey = new File("", "publickey.txt").exists();
-					boolean checkPrivKey = new File("", "privatekey.txt").exists();
+					boolean checkPubKey = new File("publickey.txt").exists();
+					boolean checkPrivKey = new File("privatekey.txt").exists();
 					if (!checkPubKey && !checkPrivKey)
 					{
-						GenKeys keygen = new GenKeys();
+						System.out.println("Generating keys...");
+						GenKeys.generateKeys();
+						System.out.println("Public and private keys generated.");
 					}
+					System.out.println("Connecting to SpartaGold network...");
 					WalletGUI window = new WalletGUI("localhost", 9001, 5,new PeerInfo("localhost", 9000));
 					window.frmSpartagoldWallet.setVisible(true);
 
@@ -74,7 +78,7 @@ public class WalletGUI
 		peer.buildPeers(initialhost, initialport, 2);
 		(new Thread(){public void run(){peer.mainLoop();}}).start();
 
-		// compare block chain size
+		//TODO: compare block chain size
 
 		// GUI start
 		frmSpartagoldWallet = new JFrame();
@@ -84,7 +88,7 @@ public class WalletGUI
 		frmSpartagoldWallet.setResizable(false);
 		frmSpartagoldWallet.setBounds(100, 100, 625, 350);
 		frmSpartagoldWallet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// frmSpartagoldWallet.setUndecorated(true);
+		//frmSpartagoldWallet.setUndecorated(true);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setForeground(new Color(11, 46, 70));
@@ -94,11 +98,13 @@ public class WalletGUI
 		JPanel send = new JPanel();
 		send.setBackground(new Color(11, 46, 70));
 		tabbedPane.addTab("Send", null, send, null);
+		tabbedPane.setBackgroundAt(0, Color.WHITE);
 		send.setLayout(null);
 
 		JPanel transactions = new JPanel();
 		transactions.setBackground(new Color(11, 46, 70));
 		tabbedPane.addTab("Transactions", null, transactions, null);
+		tabbedPane.setBackgroundAt(1, Color.WHITE);
 		transactions.setLayout(null);
 
 		table = new JTable(previousTransactions, transactionColumns);
@@ -112,13 +118,21 @@ public class WalletGUI
 		JPanel mine = new JPanel();
 		mine.setBackground(new Color(11, 46, 70));
 		tabbedPane.addTab("Mine", null, mine, null);
+		tabbedPane.setBackgroundAt(2, Color.WHITE);
 		mine.setLayout(null);
 
-		JButton btnMine = new JButton("Mine for Gold");
+		
+		BufferedImage mineButtonIcon = ImageIO.read(new File("src/spartagold/img/mineButton.png"));
+		JButton btnMine = new JButton(new ImageIcon(mineButtonIcon));
+		btnMine.setBorder(BorderFactory.createEmptyBorder());
+		btnMine.setContentAreaFilled(false);
+		btnMine.setBounds(196, 132, 200, 75);
+		mine.add(btnMine);
 		btnMine.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0)
 			{
+				System.out.println("Mining for Gold selected. Creating Miner object...");
 				Miner m = null;
 				try
 				{
@@ -132,43 +146,44 @@ public class WalletGUI
 				Thread t = new Thread(r);
 				// TODO: find a way to stop mining process when solution found from someone else
 				t.start();
+				System.out.println("Mining has begun.");
 				for (PeerInfo pid : peer.getAllPeers())
 				{
+					System.out.println("Broadcasting to " + pid.toString());
 					peer.connectAndSendObject(pid,
 							SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
 				}
 			}
 		});
-		btnMine.setBounds(218, 97, 154, 44);
-		mine.add(btnMine);
+		
 
 		JButton btnStop = new JButton("Stop");
 		btnStop.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0)
 			{
-				isMining = false;
+				//TODO: stop mining
 			}
 		});
-		btnStop.setBounds(249, 152, 89, 23);
+		btnStop.setBounds(248, 218, 89, 23);
 		mine.add(btnStop);
 
 		JPanel panel = new JPanel();
 		panel.setBackground(UIManager.getColor("activeCaption"));
-		panel.setBounds(20, 23, 567, 136);
+		panel.setBounds(20, 23, 571, 136);
 		send.add(panel);
 		panel.setLayout(null);
 
 		JLabel lblWalletAmount = new JLabel(Double.toString(myBalance));
 		lblWalletAmount.setBounds(421, 66, 92, 39);
 		panel.add(lblWalletAmount);
-		lblWalletAmount.setForeground(new Color(234, 230, 118));
+		lblWalletAmount.setForeground(Color.BLACK);
 		lblWalletAmount.setFont(new Font("Segoe UI Light", Font.BOLD, 27));
 
 		JLabel lblSG2 = new JLabel("SG");
 		lblSG2.setBounds(523, 66, 44, 39);
 		panel.add(lblSG2);
-		lblSG2.setForeground(new Color(234, 230, 118));
+		lblSG2.setForeground(Color.BLACK);
 		lblSG2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 27));
 
 		JLabel lblBalance = new JLabel("Balance:");
@@ -177,12 +192,33 @@ public class WalletGUI
 		lblBalance.setForeground(Color.BLACK);
 		lblBalance.setFont(new Font("Segoe UI Semibold", Font.BOLD, 20));
 
-		JButton btnSend = new JButton("Send");
-		btnSend.setBounds(292, 80, 100, 26);
+		BufferedImage sendButtonIcon = ImageIO.read(new File("src/spartagold/img/sendButton.png"));
+		JButton btnSend = new JButton(new ImageIcon(sendButtonIcon));
+		btnSend.setBorder(BorderFactory.createEmptyBorder());
+		btnSend.setContentAreaFilled(false);
+		btnSend.setBounds(292, 66, 100, 38);
 		panel.add(btnSend);
+		btnSend.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0)
+			{
+				if (tfAmount.getText() != "" && tfAddress.getText() != "")
+				{
+					System.out.println("Sending transaction " + tfAmount.getText() + " to " + tfAddress.getText());
+					Transaction msgdata = new Transaction(tfAddress.getText(), Double.parseDouble(tfAmount.getText()));
+					for (PeerInfo pid : peer.getAllPeers())
+					{
+						System.out.println("Broadcasting to " + pid.toString());
+						peer.connectAndSendObject(pid, SpartaGoldNode.TRANSACTION, msgdata);
+					}
+				}
+				tfAmount.setText("");
+				tfAddress.setText("");
+			}
+		});
 
 		tfAmount = new JTextField();
-		tfAmount.setBounds(78, 83, 100, 20);
+		tfAmount.setBounds(92, 83, 100, 20);
 		panel.add(tfAmount);
 		tfAmount.setColumns(10);
 
@@ -192,35 +228,27 @@ public class WalletGUI
 		lblAmount.setForeground(Color.BLACK);
 
 		JLabel lblAddress = new JLabel("Address:");
-		lblAddress.setBounds(10, 27, 43, 26);
+		lblAddress.setBounds(10, 27, 63, 26);
 		panel.add(lblAddress);
 		lblAddress.setForeground(Color.BLACK);
 
 		JLabel lblSG1 = new JLabel("SG");
-		lblSG1.setBounds(188, 80, 20, 26);
+		lblSG1.setBounds(202, 80, 20, 26);
 		panel.add(lblSG1);
 		lblSG1.setForeground(Color.BLACK);
 
 		tfAddress = new JTextField();
-		tfAddress.setBounds(72, 30, 320, 20);
+		tfAddress.setBounds(92, 30, 300, 20);
 		panel.add(tfAddress);
 		tfAddress.setColumns(10);
-		btnSend.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent arg0)
-			{
-				if (tfAmount.getText() != "" && tfAddress.getText() != "")
-				{
-					Transaction msgdata = new Transaction(tfAddress.getText(), Double.parseDouble(tfAmount.getText()));
-					for (PeerInfo pid : peer.getAllPeers())
-					{
-						peer.connectAndSendObject(pid, SpartaGoldNode.TRANSACTION, msgdata);
-					}
-				}
-				tfAmount.setText("");
-				tfAddress.setText("");
-			}
-		});
+		
+		
+		BufferedImage logo = ImageIO.read(new File("src/spartagold/img/spartagoldlogo02.png"));
+		Image scaledLogo = logo.getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH);
+		JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
+		logoLabel.setBounds(79, 170, 450, 112);
+		send.add(logoLabel);
+		
 
 		// GUI end
 	}

@@ -1,7 +1,10 @@
 package spartagold.wallet.backend;
 
-import java.security.*;
-import java.security.spec.*;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.spec.PKCS8EncodedKeySpec;
+
 import org.apache.commons.codec.binary.Base64;
 
 class VerifySignature
@@ -13,11 +16,12 @@ class VerifySignature
 		/* Verify a DSA signature */
 		try
 		{
+			System.out.println("Verifying signature of " + trans + "...");
 			/* import encoded public key */
 			Base64 decoder = new Base64();
 			byte[] pubArray = decoder.decode(senderPubKey);
 
-			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubArray);
+			PKCS8EncodedKeySpec pubKeySpec = new PKCS8EncodedKeySpec(pubArray);
 
 			KeyFactory keyFactory = KeyFactory.getInstance("EC");
 			PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
@@ -45,6 +49,7 @@ class VerifySignature
 
 	public boolean isVerified()
 	{
+		System.out.println("Signature verified.");
 		return verifies;
 	}
 

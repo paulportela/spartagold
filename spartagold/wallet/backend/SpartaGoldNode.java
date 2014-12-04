@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
+
+
+
+
+
 import spartagold.framework.HandlerInterface;
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.Node;
@@ -13,6 +19,12 @@ import spartagold.framework.PeerConnection;
 import spartagold.framework.PeerInfo;
 import spartagold.framework.PeerMessage;
 import spartagold.framework.RouterInterface;
+
+
+
+
+
+
 
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -243,11 +255,13 @@ public class SpartaGoldNode extends Node implements Serializable
 
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
+			System.out.println("FOUNDSOLUTION message received. Deserializing...");
 			Block b = (Block) SerializationUtils.deserialize(msg.getMsgDataBytes());
 			
 			boolean solution = false;
 			try
 			{
+				System.out.println("Verifying block...");
 				solution = Verify.verifyBlock(b);
 			} 
 			catch (NoSuchAlgorithmException e)
@@ -266,6 +280,7 @@ public class SpartaGoldNode extends Node implements Serializable
 					blockChain.addBlock(b);
 					for (PeerInfo pid : peer.getAllPeers())
 					{
+						System.out.println("Broadcasting to " + pid.toString());
 						peer.connectAndSendObject(pid, FOUNDSOLUTION , b);
 					}
 				}
@@ -284,16 +299,17 @@ public class SpartaGoldNode extends Node implements Serializable
 
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
+			System.out.println("TRANSACTION message received. Deserializing...");
 			Transaction t = (Transaction) SerializationUtils.deserialize(msg.getMsgDataBytes());
 			
 			boolean valid = false;
 			try
 			{
+				System.out.println("Verifying transaction...");
 				valid = Verify.verifyTransaction(t, blockChain);
 			} 
 			catch (Exception e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -302,12 +318,13 @@ public class SpartaGoldNode extends Node implements Serializable
 				transactions.add(t);
 				for (PeerInfo pid : peer.getAllPeers())
 				{
+					System.out.println("Broadcasting to " + pid.toString());
 					peer.connectAndSendObject(pid, TRANSACTION, t);
 				}
 			} 
 			else
 			{
-				peerconn.sendData(new PeerMessage(ERROR, "Transation couldn't get validated"));
+				peerconn.sendData(new PeerMessage(ERROR, "Transaction not verified."));
 			}
 		}
 	}

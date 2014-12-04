@@ -41,11 +41,13 @@ public class Verify
 					}
 					if (tempAmount >= amount)
 					{
+						System.out.println("Transaction verified.");
 						return true;
 					}
 				}
 			}
 		} 
+		System.out.println("Transaction not verified.");
 		return false;
 	}
 
@@ -63,7 +65,11 @@ public class Verify
 		String hash = hash(blockString + solution).toString();
 
 		if (zeros.equals(hash))
+		{
+			System.out.println("Block verified.");
 			return true;
+		}
+		System.out.println("Block not verified.");
 		return false;
 	}
 

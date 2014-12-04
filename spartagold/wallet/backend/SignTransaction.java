@@ -2,7 +2,7 @@ package spartagold.wallet.backend;
 
 import java.io.*;
 import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Scanner;
 
 import org.apache.commons.codec.binary.Base64;
@@ -17,7 +17,7 @@ public class SignTransaction
 		{
 			/* Create a Signature object and initialize it with the private key */
 			/* import encoded private key */
-
+			System.out.println("Signing transaction with private key...");
 			Scanner privIn = new Scanner(new File("privatekey.txt"));
 			String priv = privIn.next();
 			privIn.close();
@@ -25,7 +25,7 @@ public class SignTransaction
 			Base64 decoder = new Base64();
 			byte[] privArray = decoder.decode(priv);
 
-			X509EncodedKeySpec privKeySpec = new X509EncodedKeySpec(privArray);
+			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(privArray);
 
 			KeyFactory keyFactory = KeyFactory.getInstance("EC");
 			PrivateKey privKey = keyFactory.generatePrivate(privKeySpec);
@@ -44,7 +44,7 @@ public class SignTransaction
 			 */
 
 			byte[] realSig = dsa.sign();
-
+			System.out.println("Transaction signed with private key.");
 			return realSig;
 
 		} 

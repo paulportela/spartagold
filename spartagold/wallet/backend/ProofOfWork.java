@@ -21,6 +21,7 @@ public class ProofOfWork extends Thread
 
 		while (!isFound)
 		{
+			System.out.println("Checking hash.");
 			String hashedString = Verify.hash(concatString + i).substring(0, NUMBER_OF_ZEROES);
 			if (hashedString.equals(zeroes))
 			{
@@ -31,7 +32,7 @@ public class ProofOfWork extends Thread
 				i++;
 			}
 		}
-
+		System.out.println("Solution found: " + randomString + i);
 		return randomString + i;
 	}
 }

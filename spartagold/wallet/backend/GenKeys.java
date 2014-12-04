@@ -7,7 +7,7 @@ import org.apache.commons.codec.binary.Base64;
 public class GenKeys
 {
 
-	public GenKeys()
+	public static void generateKeys()
 	{
 		/* Generate a DSA signature */
 		try
@@ -34,8 +34,8 @@ public class GenKeys
 			Base64 encoder2 = new Base64();
 			String s2 = encoder2.encodeToString(pubArray);
 			BufferedWriter writer2 = new BufferedWriter(new FileWriter("publickey.txt"));
-			writer1.write(s2);
-			writer1.close();
+			writer2.write(s2);
+			writer2.close();
 		} 
 		catch (Exception e)
 		{

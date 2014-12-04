@@ -35,6 +35,7 @@ public class Transaction
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("New transaction created - ID: " + id);
 
 	}
 
