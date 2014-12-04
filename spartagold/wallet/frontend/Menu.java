@@ -9,7 +9,7 @@ package spartagold.wallet.frontend;
  *
  * @author mojiarmin
  */
-public class menu {
+public class Menu {
 
     private Screen screen;
     private GetInput getinput;
@@ -20,7 +20,7 @@ public class menu {
     private static final int help = 4;
     private static final int EXIT = 5;
 
-    public menu() {
+    public Menu() {
         screen = new Screen();
         getinput = new GetInput();
     }

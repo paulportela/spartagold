@@ -3,6 +3,7 @@ package spartagold.wallet.backend;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+@SuppressWarnings("serial")
 public class BlockChain implements Serializable
 {
 	private ArrayList<Block> chain;
@@ -12,12 +13,12 @@ public class BlockChain implements Serializable
 		super();
 		chain = new ArrayList<Block>();
 	}
-	
+
 	public void addBlock(Block b)
 	{
 		chain.add(b);
 	}
-	
+
 	public int getChainSize()
 	{
 		return chain.size();
@@ -33,11 +34,16 @@ public class BlockChain implements Serializable
 		this.chain = chain;
 	}
 
+	public boolean contains(Block b)
+	{
+		return this.chain.contains(b);
+
+	}
+
 	@Override
 	public String toString()
 	{
 		return "BlockChain [chain=" + chain + "]";
 	}
-	
-	
+
 }

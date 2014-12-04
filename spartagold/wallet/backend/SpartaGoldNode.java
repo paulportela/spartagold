@@ -1,17 +1,10 @@
 package spartagold.wallet.backend;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
+
 
 import spartagold.framework.HandlerInterface;
 import spartagold.framework.LoggerUtil;
@@ -20,8 +13,11 @@ import spartagold.framework.PeerConnection;
 import spartagold.framework.PeerInfo;
 import spartagold.framework.PeerMessage;
 import spartagold.framework.RouterInterface;
-import spartagold.framework.SerializationUtils;
 
+
+import org.apache.commons.lang3.SerializationUtils;
+
+@SuppressWarnings("serial")
 public class SpartaGoldNode extends Node implements Serializable
 {
 	// Message Types
@@ -37,7 +33,7 @@ public class SpartaGoldNode extends Node implements Serializable
 	public static final String REPLY = "REPL";
 	public static final String ERROR = "ERRO";
 
-	private boolean mining;
+	//private boolean mining;
 
 	private ArrayList<Transaction> transactions;
 	private BlockChain blockChain;
@@ -47,7 +43,7 @@ public class SpartaGoldNode extends Node implements Serializable
 		super(maxPeers, myInfo);
 		transactions = new ArrayList<>();
 		blockChain = new BlockChain();
-		mining = false;
+		//mining = false;
 
 		this.addRouter(new Router(this));
 
@@ -249,12 +245,12 @@ public class SpartaGoldNode extends Node implements Serializable
 		{
 			Block b = (Block) SerializationUtils.deserialize(msg.getMsgDataBytes());
 			
-			// TODO validate block b by checking proof
 			boolean solution = false;
 			try
 			{
-				solution = Validator.validateProofOfBlock(b);
-			} catch (NoSuchAlgorithmException e)
+				solution = Verify.verifyBlock(b);
+			} 
+			catch (NoSuchAlgorithmException e)
 			{
 				e.printStackTrace();
 			}
@@ -265,10 +261,13 @@ public class SpartaGoldNode extends Node implements Serializable
 			}
 			else
 			{
-				blockChain.addBlock(b);
-				for (PeerInfo pid : peer.getAllPeers())
+				if(!blockChain.contains(b))
 				{
-					peer.connectAndSendObject(pid, FOUNDSOLUTION , b);
+					blockChain.addBlock(b);
+					for (PeerInfo pid : peer.getAllPeers())
+					{
+						peer.connectAndSendObject(pid, FOUNDSOLUTION , b);
+					}
 				}
 			}
 		}
@@ -287,8 +286,16 @@ public class SpartaGoldNode extends Node implements Serializable
 		{
 			Transaction t = (Transaction) SerializationUtils.deserialize(msg.getMsgDataBytes());
 			
-			// TODO validate transaction object before
-			boolean valid = Validator.validateTransaction(t, blockChain);
+			boolean valid = false;
+			try
+			{
+				valid = Verify.verifyTransaction(t, blockChain);
+			} 
+			catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			if (!transactions.contains(t) && valid)
 			{
@@ -311,6 +318,7 @@ public class SpartaGoldNode extends Node implements Serializable
 	 */
 	private class BlockChainHandler implements HandlerInterface
 	{
+		@SuppressWarnings("unused")
 		private Node peer;
 
 		public BlockChainHandler(Node peer)
@@ -321,7 +329,14 @@ public class SpartaGoldNode extends Node implements Serializable
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
 			byte[] dataObject = SerializationUtils.serialize(blockChain);
+			//Compare sizes of blockchain also figure out how to send a request ledger when gui starts up
 			peerconn.sendData(new PeerMessage(REPLY, dataObject));
 		}
+	}
+	
+	public Transaction getTransaction() 
+	{
+		if(!transactions.isEmpty()) return transactions.get(0);
+		else return null;
 	}
 }

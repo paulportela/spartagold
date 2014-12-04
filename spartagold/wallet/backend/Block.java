@@ -1,31 +1,32 @@
 package spartagold.wallet.backend;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
+@SuppressWarnings("serial")
 public class Block implements Serializable
 {
 	private String id;
 	private String solution;
-	
-	//TODO change miderId to something else
-	private String minerId;
-	
+	private String minerPubKey;
 	private String previousBlockID;
-	private ArrayList<Transaction> trans;
-	
-	private static final int REWARDAMOUNT = 5;
-	
-	public Block(String solution, String minerId)
+	private ArrayList<Transaction> transactionList;
+
+	private static final double REWARDAMOUNT = 5;
+
+	public Block() throws IOException
 	{
 		super();
 		this.id = UUID.randomUUID().toString();
-		this.solution = solution;
-		this.minerId = UUID.randomUUID().toString();
-		
-		trans = new ArrayList<Transaction>();
-		trans.add(new Transaction(REWARDAMOUNT, minerId));
+		BufferedReader br = new BufferedReader(new FileReader("publickey.txt"));
+		minerPubKey = br.readLine();
+		br.close();
+		transactionList = new ArrayList<Transaction>();
+		transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT));
 	}
 
 	public String getPreviousBlockID()
@@ -38,14 +39,14 @@ public class Block implements Serializable
 		this.previousBlockID = previousBlockID;
 	}
 
-	public String getMinerId()
+	public String getMinerPubKey()
 	{
-		return minerId;
+		return minerPubKey;
 	}
 
-	public void setMinerId(String minerId)
+	public void setMinerPubKey(String minerPubKey)
 	{
-		this.minerId = minerId;
+		this.minerPubKey = minerPubKey;
 	}
 
 	public String getSolution()
@@ -65,21 +66,19 @@ public class Block implements Serializable
 
 	public ArrayList<Transaction> getTransactions()
 	{
-		return trans;
+		return transactionList;
 	}
 
 	public void addTransaction(Transaction t)
 	{
-		trans.add(t);
+		transactionList.add(t);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Block [id=" + id + ", solution=" + solution + ", minerId="
-				+ minerId + ", previousBlockID=" + previousBlockID + ", trans="
-				+ trans + "]";
+		return "Block [id=" + id + ", minerPubKey=" + minerPubKey
+				+ ", previousBlockID=" + previousBlockID + ", trans="
+				+ transactionList + "]";
 	}
-	
-	
 }

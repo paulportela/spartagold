@@ -5,9 +5,6 @@
  */
 package spartagold.wallet.frontend;
 
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-
 /**
  *
  * @author mojiarmin
@@ -25,7 +22,7 @@ public class SpartaGoldCLI {
         String inputString = br.readLine();
         System.out.println("You Entered ::" + inputString);*/
         
-        menu goldMenu = new menu();
+        Menu goldMenu = new Menu();
         goldMenu.displayMenu();
     }
 }

@@ -4,6 +4,7 @@ package spartagold.framework;
 
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.SerializationUtils;
 
 //import peerbase.socket.SocketFactory;
 //import peerbase.socket.SocketInterface;
@@ -155,6 +158,7 @@ public class Node
 		String host = "";
 		try 
 		{
+			@SuppressWarnings("resource")
 			Socket s = new Socket("www.google.com", 80);
 			host = s.getLocalAddress().getHostAddress();
 		}
@@ -233,7 +237,7 @@ public class Node
 		List<PeerMessage> msgreply = new ArrayList<PeerMessage>();
 		try 
 		{
-			byte[] data = SerializationUtils.serialize(objdata);
+			byte[] data = SerializationUtils.serialize((Serializable) objdata);
 			PeerConnection peerconn = new PeerConnection(pd);
 			PeerMessage tosend = new PeerMessage(msgtype, data);
 			peerconn.sendData(tosend);
