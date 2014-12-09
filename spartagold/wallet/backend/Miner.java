@@ -2,6 +2,14 @@ package spartagold.wallet.backend;
 
 import java.io.IOException;
 
+/**
+ * Initiates proof-of-work and saves solution into a block object. Adds transaction
+ * to block.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
+
 public class Miner implements Runnable
 {
 

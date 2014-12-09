@@ -1,8 +1,15 @@
 package spartagold.wallet.backend;
 
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+/**
+ * Contains a transaction verification method used to check the block chain if a transaction
+ * is legitimate, and a block verification method used to check if a solution if legitimate.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
 
 public class Verify
 {
@@ -12,9 +19,10 @@ public class Verify
 	/**
 	 * Verifies a transaction by checking if the sender has the funds to send the amount
 	 * specified in the transaction
+	 *
 	 * @param transaction
 	 * @param bc
-	 * @return
+	 * @return a boolean value of the status of verification
 	 * @throws Exception
 	 */
 	public static boolean verifyTransaction(Transaction transaction, BlockChain bc) throws Exception
@@ -53,8 +61,9 @@ public class Verify
 
 	/**
 	 * Verify block by rehashing the block's string and the solution.
-	 * @param block
-	 * @return
+	 * 
+	 * @param block 		Block object containing solution
+	 * @return a boolean value of the status of verification
 	 * @throws NoSuchAlgorithmException
 	 */
 	public static boolean verifyBlock(Block block) throws NoSuchAlgorithmException
@@ -74,10 +83,10 @@ public class Verify
 	}
 
 	/**
-	 * Hash function. ToString objects and concatenate to get hash.
+	 * Hash function in SHA-256. ToString objects and concatenate to get hash.
 	 * 
-	 * @param data
-	 * @return
+	 * @param data			String of data to be hashed in SHA-256
+	 * @return StringBuilder object containing the hashed data
 	 * @throws NoSuchAlgorithmException
 	 */
 	public static StringBuilder hash(String data) throws NoSuchAlgorithmException

@@ -5,6 +5,15 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.UUID;
 
+/**
+ * Transaction object which contains all necessary information to conduct a valid transaction.
+ * Contains a get method for all instance variables, and a set function for variables allowed
+ * to change.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
+
 public class Transaction
 {
 	private String trans;
@@ -14,6 +23,13 @@ public class Transaction
 	private double amount;
 	private String receiverPubKey;
 	private boolean isValid;
+
+	/**
+	 * Constructor initializes instance variables with parameters.
+	 *
+	 * @param receiverPubKey		String of receiver's public key
+	 * @param amount				double number of amount being sent
+	 */
 
 	public Transaction(String receiverPubKey, double amount)
 	{
@@ -32,7 +48,6 @@ public class Transaction
 		} 
 		catch (FileNotFoundException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("New transaction created - ID: " + id);

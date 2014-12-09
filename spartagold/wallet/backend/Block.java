@@ -7,6 +7,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * Contains a reward transaction awarded to the specified miner, the solution found,
+ * and an ArrayList of transactions solved. Get, set, add, and toString methods
+ * provide access to instance variables.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
+
 @SuppressWarnings("serial")
 public class Block implements Serializable
 {

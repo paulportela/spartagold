@@ -1,21 +1,27 @@
 package spartagold.wallet.frontend;
 
 import java.awt.*;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 import spartagold.framework.PeerInfo;
 import spartagold.wallet.backend.GenKeys;
 import spartagold.wallet.backend.Miner;
 import spartagold.wallet.backend.SpartaGoldNode;
 import spartagold.wallet.backend.Transaction;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+
+/**
+ * Front end graphical user interface that accesses all functionality of the SpartaGold Wallet,
+ * then broadcasts messages to known peers. A connection is established at the start of the
+ * Wallet, along with a unique public and private key.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
 
 public class WalletGUI
 {

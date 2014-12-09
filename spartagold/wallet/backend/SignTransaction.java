@@ -4,8 +4,14 @@ import java.io.*;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Scanner;
-
 import org.apache.commons.codec.binary.Base64;
+
+/**
+ * Signs a transaction string using an EC private key and SHA-1. Decodes private key with base 64.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
 
 public class SignTransaction
 {
@@ -32,18 +38,18 @@ public class SignTransaction
 
 			/* Update and sign the data */
 
-			Signature dsa = Signature.getInstance("SHA1withECDSA");
+			Signature ecdsa = Signature.getInstance("SHA1withECDSA");
 
-			dsa.initSign(privKey);
+			ecdsa.initSign(privKey);
 			byte[] strByte = trans.getBytes("UTF-8");
-			dsa.update(strByte);
+			ecdsa.update(strByte);
 
 			/*
 			 * Now that all the data to be signed has been read in, generate a
 			 * signature for it
 			 */
 
-			byte[] realSig = dsa.sign();
+			byte[] realSig = ecdsa.sign();
 			System.out.println("Transaction signed with private key.");
 			return realSig;
 
