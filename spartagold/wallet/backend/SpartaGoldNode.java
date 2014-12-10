@@ -277,6 +277,7 @@ public class SpartaGoldNode extends Node implements Serializable
 			{
 				if(!blockChain.contains(b))
 				{
+					
 					blockChain.addBlock(b);
 					for (PeerInfo pid : peer.getAllPeers())
 					{
@@ -355,5 +356,10 @@ public class SpartaGoldNode extends Node implements Serializable
 	{
 		if(!transactions.isEmpty()) return transactions.get(0);
 		else return null;
+	}
+	
+	public BlockChain getBlockChain()
+	{
+		return blockChain;
 	}
 }

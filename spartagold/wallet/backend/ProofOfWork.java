@@ -7,13 +7,13 @@ import java.util.UUID;
 public class ProofOfWork extends Thread
 {
 
-	private static final int NUMBER_OF_ZEROES = 5;
+	private static final int NUMBER_OF_ZEROES = 15;
 
 	public static String findProof(String blockString) throws UnsupportedEncodingException, Exception
 	{
 		String randomString = UUID.randomUUID().toString();
 
-		int i = 0;
+		long i = 0;
 		boolean isFound = false;
 		String zeroes = String.format(String.format("%%%ds", NUMBER_OF_ZEROES), " ").replace(" ", "0");
 
@@ -26,7 +26,7 @@ public class ProofOfWork extends Thread
 			if (hashedString.equals(zeroes))
 			{
 				isFound = true;
-			} 
+			}
 			else
 			{
 				i++;

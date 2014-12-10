@@ -11,10 +11,12 @@ public class Miner implements Runnable
 	 */
 
 	private Block block;
+	private BlockChain chain;
 	private String solution;
 
-	public Miner(Transaction t) throws IOException
+	public Miner(Transaction t, BlockChain bc) throws IOException
 	{
+		this.chain = bc;
 		block = new Block();
 		block.addTransaction(t);
 		solution = "";
@@ -45,4 +47,5 @@ public class Miner implements Runnable
 	{
 		block.addTransaction(trans);
 	}
+
 }

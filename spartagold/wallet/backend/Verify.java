@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 public class Verify
 {
 
-	private static final int NUMOFZEROES = 4;
+	private static final int NUMBER_OF_ZEROES = 15;
 
 	/**
 	 * Verifies a transaction by checking if the sender has the funds to send the amount
@@ -59,7 +59,7 @@ public class Verify
 	 */
 	public static boolean verifyBlock(Block block) throws NoSuchAlgorithmException
 	{
-		String zeros = new String(new char[NUMOFZEROES]).replace("\0", "0");
+		String zeros = new String(new char[NUMBER_OF_ZEROES]).replace("\0", "0");
 		String solution = block.getSolution();
 		String blockString = block.toString();
 		String hash = hash(blockString + solution).toString();

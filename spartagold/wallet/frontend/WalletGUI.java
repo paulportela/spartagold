@@ -54,7 +54,7 @@ public class WalletGUI
 						System.out.println("Public and private keys generated.");
 					}
 					System.out.println("Connecting to SpartaGold network...");
-					WalletGUI window = new WalletGUI("localhost", 9001, 5,new PeerInfo("localhost", 9000));
+					WalletGUI window = new WalletGUI("localhost", 9000, 5,new PeerInfo("localhost", 9002));
 					window.frmSpartagoldWallet.setVisible(true);
 
 				} 
@@ -122,7 +122,7 @@ public class WalletGUI
 		mine.setLayout(null);
 
 		
-		BufferedImage mineButtonIcon = ImageIO.read(new File("src/spartagold/img/mineButton.png"));
+		BufferedImage mineButtonIcon = ImageIO.read(new File("/home/paul/workspace/P2P/src/spartagold/img/mineButton.png"));
 		JButton btnMine = new JButton(new ImageIcon(mineButtonIcon));
 		btnMine.setBorder(BorderFactory.createEmptyBorder());
 		btnMine.setContentAreaFilled(false);
@@ -136,7 +136,7 @@ public class WalletGUI
 				Miner m = null;
 				try
 				{
-					m = new Miner(peer.getTransaction());
+					m = new Miner(peer.getTransaction(), peer.getBlockChain());
 				} 
 				catch (IOException e)
 				{
@@ -150,8 +150,7 @@ public class WalletGUI
 				for (PeerInfo pid : peer.getAllPeers())
 				{
 					System.out.println("Broadcasting to " + pid.toString());
-					peer.connectAndSendObject(pid,
-							SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
+					peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
 				}
 			}
 		});
@@ -192,7 +191,7 @@ public class WalletGUI
 		lblBalance.setForeground(Color.BLACK);
 		lblBalance.setFont(new Font("Segoe UI Semibold", Font.BOLD, 20));
 
-		BufferedImage sendButtonIcon = ImageIO.read(new File("src/spartagold/img/sendButton.png"));
+		BufferedImage sendButtonIcon = ImageIO.read(new File("/home/paul/workspace/P2P/src/spartagold/img/sendButton.png"));
 		JButton btnSend = new JButton(new ImageIcon(sendButtonIcon));
 		btnSend.setBorder(BorderFactory.createEmptyBorder());
 		btnSend.setContentAreaFilled(false);
@@ -243,7 +242,7 @@ public class WalletGUI
 		tfAddress.setColumns(10);
 		
 		
-		BufferedImage logo = ImageIO.read(new File("src/spartagold/img/spartagoldlogo02.png"));
+		BufferedImage logo = ImageIO.read(new File("/home/paul/workspace/P2P/src/spartagold/img/spartagoldlogo02.png"));
 		Image scaledLogo = logo.getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH);
 		JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
 		logoLabel.setBounds(79, 170, 450, 112);

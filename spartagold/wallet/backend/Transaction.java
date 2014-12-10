@@ -2,6 +2,7 @@ package spartagold.wallet.backend;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -14,9 +15,11 @@ public class Transaction
 	private double amount;
 	private String receiverPubKey;
 	private boolean isValid;
+	private ArrayList<String> validIds;
 
 	public Transaction(String receiverPubKey, double amount)
 	{
+		this.validIds = new ArrayList<String>();
 		this.receiverPubKey = receiverPubKey;
 		Scanner in;
 		try
@@ -29,7 +32,7 @@ public class Transaction
 			id = UUID.randomUUID().toString();
 			trans = id + this.receiverPubKey + amount;
 			signed = SignTransaction.sign(trans);
-		} 
+		}
 		catch (FileNotFoundException e)
 		{
 			// TODO Auto-generated catch block
@@ -84,4 +87,8 @@ public class Transaction
 		this.isValid = isValid;
 	}
 
+	public void addValidId(String s)
+	{
+		validIds.add(s);
+	}
 }
