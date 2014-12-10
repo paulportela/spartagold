@@ -4,16 +4,30 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
-
 import org.apache.commons.codec.binary.Base64;
+
+/**
+ * Verifies a signed transaction by comparing the signed byte array to the original
+ * transaction string, using the sender's public key. Uses base 64 to decode key.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
 
 class VerifySignature
 {
 	private boolean verifies = false;
 
+	/**
+	 * Constructor performs process upon creation.
+	 *
+	 * @param senderPubKey			String of sender's public key
+	 * @param signed				byte array of the signed transaction string
+	 * @param trans 				String of transaction object
+	 */
 	public VerifySignature(String senderPubKey, byte[] signed, String trans)
 	{
-		/* Verify a DSA signature */
+		/* Verify an EC signature */
 		try
 		{
 			System.out.println("Verifying signature of " + trans + "...");
@@ -47,6 +61,9 @@ class VerifySignature
 		}
 	}
 
+	/**
+	 * @return a boolean of verifies instance variable
+	 */
 	public boolean isVerified()
 	{
 		System.out.println("Signature verified.");

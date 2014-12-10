@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package spartagold.wallet.frontend;
 
 /**
@@ -11,21 +7,13 @@ package spartagold.wallet.frontend;
  */
 public class SpartaGoldCLI {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception {
-        // TODO code application logic here
-        /*InputStreamReader ir = new InputStreamReader(System.in);
-        BufferedReader br = new BufferedReader(ir);
-        System.out.println("Please Enter any String::");
-        String inputString = br.readLine();
-        System.out.println("You Entered ::" + inputString);*/
-        
-        Menu goldMenu = new Menu();
-        goldMenu.displayMenu();
-    }
+	/**
+	 * @param args
+	 *            the command line arguments
+	 */
+	public static void main(String[] args) throws Exception {
+
+		Menu goldMenu = new Menu();
+		goldMenu.performMenuOption(); 
+	}
 }
-
-
-

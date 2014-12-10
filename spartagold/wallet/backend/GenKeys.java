@@ -4,6 +4,14 @@ import java.io.*;
 import java.security.*;
 import org.apache.commons.codec.binary.Base64;
 
+/**
+ * Generates public and private key pair with Eliptic Curve (EC), then encodes keys into
+ * base 64 and saves each key into a local text file for readability.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
+
 public class GenKeys
 {
 

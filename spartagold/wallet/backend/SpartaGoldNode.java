@@ -4,14 +4,6 @@ import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-
-
-
-
-
-
-
-
 import spartagold.framework.HandlerInterface;
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.Node;
@@ -19,15 +11,14 @@ import spartagold.framework.PeerConnection;
 import spartagold.framework.PeerInfo;
 import spartagold.framework.PeerMessage;
 import spartagold.framework.RouterInterface;
-
-
-
-
-
-
-
-
 import org.apache.commons.lang3.SerializationUtils;
+
+/**
+ * Contains all handlers of all types of messages received through the P2P network.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
 
 @SuppressWarnings("serial")
 public class SpartaGoldNode extends Node implements Serializable

@@ -1,8 +1,16 @@
 package spartagold.wallet.backend;
 
-
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
+
+/**
+ * Performs the proof-of-work algorithm on a block string. Creates a random string, then concatenates
+ * random string to block string and an increasing long number. If a hash of this concatenation 
+ * contains a number of zeroes equal to NUMBER_OF_ZEROES, solution is found.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
 
 public class ProofOfWork extends Thread
 {

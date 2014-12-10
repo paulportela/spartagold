@@ -1,29 +1,28 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package spartagold.wallet.frontend;
+
+
+<<<<<<< HEAD
+=======
+package spartagold.wallet.frontend;
+>>>>>>> 5cdab83919b01deea187ad3914bb6d1ba1204760
 import java.util.Scanner;
 /**
  *
  * @author mojiarmin
  */
-public class GetInput {
-    //reads data from the command line
+public class GetInput 
+{
+
     private Scanner input;
-    //no argument constructor initialize the scanner
-    public GetInput(){
+
+    public GetInput()
+    {
          input = new Scanner(System.in);
     }
-    /**
-     * get input
-     * @return an integer value entered by user
-     */
+
     public int getInput()
-    {   String x = input.nextLine();
-       
+    {   
+    	String x = input.nextLine();
         return Integer.parseInt(x);
     }
     

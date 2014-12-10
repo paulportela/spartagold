@@ -3,6 +3,13 @@ package spartagold.wallet.backend;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Creates ArrayList of blocks with add, get, set, and toString methods.
+ * 
+ * @author Art Tucay Jr., Paul Portela
+ * @version 1.0.0
+ */
+
 @SuppressWarnings("serial")
 public class BlockChain implements Serializable
 {

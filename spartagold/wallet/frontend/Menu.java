@@ -1,15 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package spartagold.wallet.frontend;
 
-/**
- *
- * @author mojiarmin
- */
-public class Menu {
+public class Menu
+{
 
     private Screen screen;
     private GetInput getinput;
@@ -25,13 +18,16 @@ public class Menu {
         getinput = new GetInput();
     }
 
-    private void performMenuOption() {
+    public void performMenuOption() 
+    {
         //user not chosen to exit
         boolean userExited = false;
-        while (!userExited) {
-            //show main menue for selection
+        while (!userExited) 
+        {
+            //show main menu for selection
             int menuSelection = displayMenu();
-            switch (menuSelection) {
+            switch (menuSelection) 
+            {
                 case getLedger:
                     //initialize new object to the chosen type
                     System.out.println("Your Selection:" + menuSelection);
@@ -64,15 +60,16 @@ public class Menu {
     /**
      * display main menu
      */
-    public int displayMenu() {
-        screen.displayMessage("\n 1:getLedger");
-        screen.displayMessage("\n 2:showLedger");
-        screen.displayMessage("\n 3:transfer");
-        screen.displayMessage("\n 4:help \n");
+    public int displayMenu() 
+    {
+    	screen.displayTitle("Welcome To SpartaGold\n"
+    			+ "This is your wallet choose an action\n");
+        screen.displayMessage("\n 1:Update Ledger");
+        screen.displayMessage("\n 2:ShowLedger");
+        screen.displayMessage("\n 3:Transfer");
+        screen.displayMessage("\n 4:Help");
         screen.displayMessage("\n 5:EXIT \n");
 
-        // return keypad.hashCode();
         return getinput.getInput();
-
     }
 }
