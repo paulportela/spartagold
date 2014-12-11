@@ -1,9 +1,18 @@
 package spartagold.wallet.backend;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
 import spartagold.framework.HandlerInterface;
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.Node;
@@ -35,17 +44,41 @@ public class SpartaGoldNode extends Node implements Serializable
 
 	public static final String REPLY = "REPL";
 	public static final String ERROR = "ERRO";
+	
+	//File Names
+	private String blockFileName = "blockchain";
 
 	//private boolean mining;
 
 	private ArrayList<Transaction> transactions;
+	private ArrayList<Transaction> myTransactions;
 	private BlockChain blockChain;
 
 	public SpartaGoldNode(int maxPeers, PeerInfo myInfo)
 	{
 		super(maxPeers, myInfo);
-		transactions = new ArrayList<>();
+		
+		//TODO Read blockchain from file
+		try
+		{
+			boolean checkBlockchainFile = new File(blockFileName).exists();
+			if(checkBlockchainFile)
+			{
+				ObjectInputStream in = new ObjectInputStream(new FileInputStream(blockFileName));
+				this.blockChain = (BlockChain) in.readObject();
+				in.close();
+			}
+		} 
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		transactions = new ArrayList<Transaction>();
 		blockChain = new BlockChain();
+		myTransactions = new ArrayList<Transaction>();
+		initializeMyTransactions();
+		
 		//mining = false;
 
 		this.addRouter(new Router(this));
@@ -246,13 +279,13 @@ public class SpartaGoldNode extends Node implements Serializable
 
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
-			System.out.println("FOUNDSOLUTION message received. Deserializing...");
+			LoggerUtil.getLogger().fine("FOUNDSOLUTION message received. Deserializing...");
 			Block b = (Block) SerializationUtils.deserialize(msg.getMsgDataBytes());
 			
 			boolean solution = false;
 			try
 			{
-				System.out.println("Verifying block...");
+				LoggerUtil.getLogger().fine("Verifying block...");
 				solution = Verify.verifyBlock(b);
 			} 
 			catch (NoSuchAlgorithmException e)
@@ -268,11 +301,27 @@ public class SpartaGoldNode extends Node implements Serializable
 			{
 				if(!blockChain.contains(b))
 				{
-					
+					ArrayList<String> unspentIds = b.getTransactions().get(1).getUnspentIds();
+					for (int i = 0; i < blockChain.getChainSize(); i++)
+					{
+						Block tempBlock = blockChain.getChain().get(i);
+						for (Transaction t : tempBlock.getTransactions())
+						{
+							innerloop:
+							for(String id: unspentIds)
+							{
+								if(id == t.getID())
+								{
+									t.setSpent(true);
+								}
+								break innerloop;
+							}
+						}
+					}
 					blockChain.addBlock(b);
 					for (PeerInfo pid : peer.getAllPeers())
 					{
-						System.out.println("Broadcasting to " + pid.toString());
+						LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
 						peer.connectAndSendObject(pid, FOUNDSOLUTION , b);
 					}
 				}
@@ -291,13 +340,13 @@ public class SpartaGoldNode extends Node implements Serializable
 
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
-			System.out.println("TRANSACTION message received. Deserializing...");
+			LoggerUtil.getLogger().fine("TRANSACTION message received. Deserializing...");
 			Transaction t = (Transaction) SerializationUtils.deserialize(msg.getMsgDataBytes());
 			
 			boolean valid = false;
 			try
 			{
-				System.out.println("Verifying transaction...");
+				LoggerUtil.getLogger().fine("Verifying transaction...");
 				valid = Verify.verifyTransaction(t, blockChain);
 			} 
 			catch (Exception e)
@@ -308,9 +357,15 @@ public class SpartaGoldNode extends Node implements Serializable
 			if (!transactions.contains(t) && valid)
 			{
 				transactions.add(t);
+				
+				//Read in public key
+				String pub = readPubKey();
+				if(pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
+					myTransactions.add(t);
+				
 				for (PeerInfo pid : peer.getAllPeers())
 				{
-					System.out.println("Broadcasting to " + pid.toString());
+					LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
 					peer.connectAndSendObject(pid, TRANSACTION, t);
 				}
 			} 
@@ -338,7 +393,7 @@ public class SpartaGoldNode extends Node implements Serializable
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
 			byte[] dataObject = SerializationUtils.serialize(blockChain);
-			//Compare sizes of blockchain also figure out how to send a request ledger when gui starts up
+			// TODO Compare sizes of blockchain also figure out how to send a request ledger when gui starts up
 			peerconn.sendData(new PeerMessage(REPLY, dataObject));
 		}
 	}
@@ -352,5 +407,60 @@ public class SpartaGoldNode extends Node implements Serializable
 	public BlockChain getBlockChain()
 	{
 		return blockChain;
+	}
+	
+	public void setBlockchain(BlockChain bc)
+	{
+		this.blockChain = bc;
+	}
+	
+	public void saveBlockchain()
+	{
+		try
+		{
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(blockFileName));
+			out.writeObject(this.blockChain);
+			out.close();
+		} 
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public ArrayList<Transaction> getMyTransactions()
+	{
+		return myTransactions;
+	}
+	
+	public void initializeMyTransactions()
+	{
+		String pub = readPubKey();
+		for (int i = 0; i < blockChain.getChainSize(); i++)
+		{
+			Block tempBlock = blockChain.getChain().get(i);
+			for (Transaction t : tempBlock.getTransactions())
+			{
+				if(pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
+					myTransactions.add(t);
+			}
+		}
+	}
+	
+	public String readPubKey()
+	{
+		Scanner pubIn;
+		try
+		{
+			pubIn = new Scanner(new File("publickey.txt"));
+			String pub = pubIn.next();
+			pubIn.close();
+			return pub;
+		} 
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

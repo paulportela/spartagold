@@ -2,6 +2,8 @@ package spartagold.wallet.backend;
 
 import java.io.IOException;
 
+import spartagold.framework.LoggerUtil;
+
 /**
  * Initiates proof-of-work and saves solution into a block object. Adds transaction
  * to block.
@@ -19,26 +21,33 @@ public class Miner implements Runnable
 	 */
 
 	private Block block;
-	private BlockChain chain;
 	private String solution;
+	private Transaction change;
 
-	public Miner(Transaction t, BlockChain bc) throws IOException
+	public Miner(Transaction t) throws IOException
 	{
-		this.chain = bc;
 		block = new Block();
 		block.addTransaction(t);
+		double total = t.getTransactionTotal() - t.getAmount();
+		t.setAmount(t.getAmount() - Block.FEE);
+		if(total > 0)
+		{
+			this.change = new Transaction(t.getSenderPubKey(), total);
+			block.addTransaction(change);
+		}
+		
 		solution = "";
-		System.out.println("Miner object created.");
+		LoggerUtil.getLogger().fine("Miner object created.");
 	}
 
 	public void run()
 	{
 		try
 		{
-			System.out.println("Finding solution...");
+			LoggerUtil.getLogger().fine("Finding solution...");
 			solution = ProofOfWork.findProof(block.toString());
 			block.setSolution(solution);
-			System.out.println("Solution has been set in block.");
+			LoggerUtil.getLogger().fine("Solution has been set in block.");
 		} 
 		catch (Exception e)
 		{

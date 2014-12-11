@@ -3,7 +3,13 @@ package spartagold.wallet.frontend;
 import java.awt.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import org.apache.commons.lang3.SerializationUtils;
+
+import spartagold.framework.LoggerUtil;
 import spartagold.framework.PeerInfo;
+import spartagold.framework.PeerMessage;
+import spartagold.wallet.backend.BlockChain;
 import spartagold.wallet.backend.GenKeys;
 import spartagold.wallet.backend.Miner;
 import spartagold.wallet.backend.SpartaGoldNode;
@@ -13,6 +19,8 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Front end graphical user interface that accesses all functionality of the SpartaGold Wallet,
@@ -25,7 +33,8 @@ import java.net.URL;
 
 public class WalletGUI
 {
-
+	//TODO peer.saveBlockchain()
+	
 	private JFrame frmSpartagoldWallet;
 	private JTextField tfAmount;
 	private JTextField tfAddress;
@@ -44,6 +53,7 @@ public class WalletGUI
 	 */
 	public static void main(String[] args) throws Exception
 	{
+		LoggerUtil.setHandlersLevel(Level.FINE);
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()
@@ -55,11 +65,11 @@ public class WalletGUI
 					boolean checkPrivKey = new File("privatekey.txt").exists();
 					if (!checkPubKey && !checkPrivKey)
 					{
-						System.out.println("Generating keys...");
+						LoggerUtil.getLogger().fine("Generating keys...");
 						GenKeys.generateKeys();
-						System.out.println("Public and private keys generated.");
+						LoggerUtil.getLogger().fine("Public and private keys generated.");
 					}
-					System.out.println("Connecting to SpartaGold network...");
+					LoggerUtil.getLogger().fine("Connecting to SpartaGold network...");
 					WalletGUI window = new WalletGUI("localhost", 9000, 5,new PeerInfo("localhost", 9002));
 					window.frmSpartagoldWallet.setVisible(true);
 
@@ -84,7 +94,14 @@ public class WalletGUI
 		peer.buildPeers(initialhost, initialport, 2);
 		(new Thread(){public void run(){peer.mainLoop();}}).start();
 
-		//TODO: compare block chain size
+		//Requesting blockchain from peers
+		for (PeerInfo pid : peer.getAllPeers())
+		{
+			List<PeerMessage> msg = peer.connectAndSend(pid, SpartaGoldNode.GETBLOCKCHAIN, null, true);
+			BlockChain bc = (BlockChain) SerializationUtils.deserialize(msg.get(0).getMsgDataBytes());
+			if(peer.getBlockChain().getChainSize() < bc.getChainSize())
+				peer.setBlockchain(bc);
+		}
 
 		// GUI start
 		frmSpartagoldWallet = new JFrame();
@@ -115,6 +132,7 @@ public class WalletGUI
 
 		table = new JTable(previousTransactions, transactionColumns);
 		table.setShowHorizontalLines(false);
+		//TODO get my transactions using peer.getMyTransactions() and display in the table
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(5, 5, 605, 250);
@@ -138,11 +156,11 @@ public class WalletGUI
 		{
 			public void actionPerformed(ActionEvent arg0)
 			{
-				System.out.println("Mining for Gold selected. Creating Miner object...");
+				LoggerUtil.getLogger().fine("Mining for Gold selected. Creating Miner object...");
 				Miner m = null;
 				try
 				{
-					m = new Miner(peer.getTransaction(), peer.getBlockChain());
+					m = new Miner(peer.getTransaction());
 				} 
 				catch (IOException e)
 				{
@@ -152,10 +170,10 @@ public class WalletGUI
 				Thread t = new Thread(r);
 				// TODO: find a way to stop mining process when solution found from someone else
 				t.start();
-				System.out.println("Mining has begun.");
+				LoggerUtil.getLogger().fine("Mining has begun.");
 				for (PeerInfo pid : peer.getAllPeers())
 				{
-					System.out.println("Broadcasting to " + pid.toString());
+					LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
 					peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
 				}
 			}
@@ -209,12 +227,13 @@ public class WalletGUI
 			{
 				if (tfAmount.getText() != "" && tfAddress.getText() != "")
 				{
-					System.out.println("Sending transaction " + tfAmount.getText() + " to " + tfAddress.getText());
-					Transaction msgdata = new Transaction(tfAddress.getText(), Double.parseDouble(tfAmount.getText()));
+					LoggerUtil.getLogger().fine("Sending transaction " + tfAmount.getText() + " to " + tfAddress.getText());
+					Transaction t = new Transaction(tfAddress.getText(), Double.parseDouble(tfAmount.getText()));
+					t.addUnspentIds(peer.getBlockChain());
 					for (PeerInfo pid : peer.getAllPeers())
 					{
-						System.out.println("Broadcasting to " + pid.toString());
-						peer.connectAndSendObject(pid, SpartaGoldNode.TRANSACTION, msgdata);
+						LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
+						peer.connectAndSendObject(pid, SpartaGoldNode.TRANSACTION, t);
 					}
 				}
 				tfAmount.setText("");

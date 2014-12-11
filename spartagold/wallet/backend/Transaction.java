@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.UUID;
 
+import spartagold.framework.LoggerUtil;
+
 /**
  * Transaction object which contains all necessary information to conduct a valid transaction.
  * Contains a get method for all instance variables, and a set function for variables allowed
@@ -23,8 +25,12 @@ public class Transaction
 	private String id;
 	private double amount;
 	private String receiverPubKey;
-	private boolean isValid;
-	private ArrayList<String> validIds;
+	private boolean isSpent;
+	private ArrayList<String> unspentIds;
+	private double transactionTotal;
+
+	
+
 
 	/**
 	 * Constructor initializes instance variables with parameters.
@@ -35,7 +41,8 @@ public class Transaction
 
 	public Transaction(String receiverPubKey, double amount)
 	{
-		this.validIds = new ArrayList<String>();
+		this.transactionTotal = 0;
+		this.unspentIds = new ArrayList<String>();
 		this.receiverPubKey = receiverPubKey;
 		Scanner in;
 		try
@@ -44,7 +51,7 @@ public class Transaction
 			senderPubKey = in.next();
 			in.close();
 			this.amount = amount;
-			isValid = true;
+			isSpent = false;
 			id = UUID.randomUUID().toString();
 			trans = id + this.receiverPubKey + amount;
 			signed = SignTransaction.sign(trans);
@@ -53,9 +60,10 @@ public class Transaction
 		{
 			e.printStackTrace();
 		}
-		System.out.println("New transaction created - ID: " + id);
+		LoggerUtil.getLogger().fine("New transaction created - ID: " + id);
 
 	}
+	
 
 	public String getID()
 	{
@@ -66,15 +74,20 @@ public class Transaction
 	{
 		return amount;
 	}
+	
+	public void setAmount(Double a)
+	{
+		this.amount = a;
+	}
 
 	public String getReceiverPubKey()
 	{
 		return receiverPubKey;
 	}
 
-	public boolean isValid()
+	public boolean isSpent()
 	{
-		return isValid;
+		return isSpent;
 	}
 
 	public String getSenderPubKey()
@@ -97,13 +110,45 @@ public class Transaction
 		this.senderPubKey = senderPubKey;
 	}
 
-	public void setValid(boolean isValid)
+	public void setSpent(boolean isSpent)
 	{
-		this.isValid = isValid;
+		this.isSpent = isSpent;
 	}
 
-	public void addValidId(String s)
+	public void addUnspentIds(BlockChain bc)
 	{
-		validIds.add(s);
+		for (int i = 0; i < bc.getChainSize(); i++)
+		{
+			Block tempBlock = bc.getChain().get(i);
+			for (Transaction t : tempBlock.getTransactions())
+			{
+				if (t.getReceiverPubKey() == senderPubKey && t.isSpent() == false)
+				{
+					transactionTotal += t.getAmount();
+					unspentIds.add(t.getID());
+				}
+				if (transactionTotal >= amount)
+				{
+					i = bc.getChainSize();
+				}
+			}
+		}
 	}
+	
+	public ArrayList<String> getUnspentIds()
+	{
+		return unspentIds;
+	}
+	
+	public double getTransactionTotal()
+	{
+		return transactionTotal;
+	}
+
+
+	public void setTransactionTotal(double transactionTotal)
+	{
+		this.transactionTotal = transactionTotal;
+	}
+	
 }

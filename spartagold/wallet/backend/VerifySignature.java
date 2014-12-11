@@ -6,6 +6,8 @@ import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import org.apache.commons.codec.binary.Base64;
 
+import spartagold.framework.LoggerUtil;
+
 /**
  * Verifies a signed transaction by comparing the signed byte array to the original
  * transaction string, using the sender's public key. Uses base 64 to decode key.
@@ -30,7 +32,7 @@ class VerifySignature
 		/* Verify an EC signature */
 		try
 		{
-			System.out.println("Verifying signature of " + trans + "...");
+			LoggerUtil.getLogger().fine("Verifying signature of " + trans + "...");
 			/* import encoded public key */
 			Base64 decoder = new Base64();
 			byte[] pubArray = decoder.decode(senderPubKey);
@@ -66,7 +68,7 @@ class VerifySignature
 	 */
 	public boolean isVerified()
 	{
-		System.out.println("Signature verified.");
+		LoggerUtil.getLogger().fine("Signature verified.");
 		return verifies;
 	}
 
