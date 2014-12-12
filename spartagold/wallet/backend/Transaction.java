@@ -2,7 +2,10 @@ package spartagold.wallet.backend;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -28,9 +31,7 @@ public class Transaction
 	private boolean isSpent;
 	private ArrayList<String> unspentIds;
 	private double transactionTotal;
-
-	
-
+	private String date;
 
 	/**
 	 * Constructor initializes instance variables with parameters.
@@ -44,6 +45,9 @@ public class Transaction
 		this.transactionTotal = 0;
 		this.unspentIds = new ArrayList<String>();
 		this.receiverPubKey = receiverPubKey;
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date d = new Date();
+		date = dateFormat.format(d);
 		Scanner in;
 		try
 		{
@@ -149,6 +153,11 @@ public class Transaction
 	public void setTransactionTotal(double transactionTotal)
 	{
 		this.transactionTotal = transactionTotal;
+	}
+	
+	public String getDate()
+	{
+		return date;
 	}
 	
 }

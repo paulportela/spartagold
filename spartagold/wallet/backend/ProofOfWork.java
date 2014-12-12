@@ -2,7 +2,6 @@ package spartagold.wallet.backend;
 
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
-
 import spartagold.framework.LoggerUtil;
 
 /**
