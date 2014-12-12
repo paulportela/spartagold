@@ -13,7 +13,7 @@ public class GenesisBlock
 		this.bc = new BlockChain();
 		this.b = new Block();
 		String pub = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEjRod7Cu2XtTn+sZMOuM9gELSaLMJuXKXyUokJCJSoiUiuhAj7yTPTlvBitSn/zbM+/1crjmqlMklBCN+0CPjsQ==";
-		this.t = new Transaction(pub, 5);
+		this.t = new Transaction(pub, 0);
 		b.addTransaction(t);
 		bc.addBlock(b);
 	}

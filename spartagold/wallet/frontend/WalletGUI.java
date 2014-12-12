@@ -18,6 +18,8 @@ import spartagold.wallet.backend.Transaction;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
@@ -36,8 +38,6 @@ import java.util.logging.Level;
 
 public class WalletGUI
 {
-	//TODO peer.saveBlockchain()
-	
 	private JFrame frmSpartagoldWallet;
 	private JTextField tfAmount;
 	private JTextField tfAddress;
@@ -119,6 +119,11 @@ public class WalletGUI
 		frmSpartagoldWallet.setBounds(100, 100, 625, 350);
 		frmSpartagoldWallet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//frmSpartagoldWallet.setUndecorated(true);
+		frmSpartagoldWallet.addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    	peer.saveBlockchain();
+		    }
+		});
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setForeground(new Color(11, 46, 70));
@@ -356,7 +361,6 @@ public class WalletGUI
 				}
 			}
 		}
-
 		return null;
 	}
 }

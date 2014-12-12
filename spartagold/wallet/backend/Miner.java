@@ -27,6 +27,7 @@ public class Miner implements Runnable
 	{
 		block = new Block();
 		block.addTransaction(t);
+		/** add this part back after genesis block is created
 		double total = t.getTransactionTotal() - t.getAmount();
 		t.setAmount(t.getAmount() - Block.FEE);
 		if(total > 0)
@@ -37,6 +38,7 @@ public class Miner implements Runnable
 		
 		solution = "";
 		LoggerUtil.getLogger().fine("Miner object created.");
+		*/
 	}
 
 	public void run()

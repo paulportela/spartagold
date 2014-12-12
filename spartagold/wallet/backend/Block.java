@@ -26,8 +26,7 @@ public class Block implements Serializable
 	private String previousBlockID;
 	private ArrayList<Transaction> transactionList;
 	public static final double FEE = 0.1;
-
-	private static final double REWARDAMOUNT = 5;
+	private static final double REWARDAMOUNT = 50;
 
 	public Block() throws IOException
 	{
@@ -37,7 +36,8 @@ public class Block implements Serializable
 		minerPubKey = br.readLine();
 		br.close();
 		transactionList = new ArrayList<Transaction>();
-		transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT + FEE));
+		//transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT + FEE));
+		transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT));
 		LoggerUtil.getLogger().fine("New block created - ID: " + id);
 	}
 
