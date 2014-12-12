@@ -97,6 +97,9 @@ public class WalletGUI
 		peer = new SpartaGoldNode(maxpeers, mypd);
 		peer.buildPeers(initialhost, initialport, 2);
 		(new Thread(){public void run(){peer.mainLoop();}}).start();
+		
+		myTransactionsList = peer.getMyTransactions();
+		myBalance = getBalance();
 
 		//Requesting blockchain from peers
 		for (PeerInfo pid : peer.getAllPeers())
@@ -281,8 +284,8 @@ public class WalletGUI
 		// GUI end
 	}
 
-	private void fillTransactionTable() {
-		myTransactionsList = peer.getMyTransactions();
+	private void fillTransactionTable()
+	{
 		previousTransactions = new Object[myTransactionsList.size()][4];
 		for (int i = 0; i < myTransactionsList.size(); i++)
 		{
@@ -304,6 +307,17 @@ public class WalletGUI
 				}
 			previousTransactions[i][3] = myTransactionsList.get(i).getAmount();
 		}
+	}
+	
+	private double getBalance()
+	{
+		double balance = 0;
+		for (Transaction t : myTransactionsList)
+		{
+			if (t.getReceiverPubKey() == peer.readPubKey() && t.isSpent() == false)
+				balance += t.getAmount();
+		}
+		return balance;
 	}
 
 	public static String getIpAddress()
