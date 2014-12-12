@@ -3,7 +3,6 @@ package spartagold.wallet.backend;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-
 import spartagold.framework.LoggerUtil;
 
 /**

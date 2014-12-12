@@ -1,7 +1,6 @@
 package spartagold.wallet.backend;
 
 import java.io.IOException;
-
 import spartagold.framework.LoggerUtil;
 
 /**

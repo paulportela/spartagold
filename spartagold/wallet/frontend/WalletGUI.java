@@ -1,6 +1,7 @@
 package spartagold.wallet.frontend;
 
 import java.awt.*;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -14,11 +15,13 @@ import spartagold.wallet.backend.GenKeys;
 import spartagold.wallet.backend.Miner;
 import spartagold.wallet.backend.SpartaGoldNode;
 import spartagold.wallet.backend.Transaction;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -42,9 +45,10 @@ public class WalletGUI
 	private static String myIpAddress;
 	private double myBalance;
 	private JTable table;
-	private Object[][] previousTransactions = {};
-	private String[] transactionColumns = { "Date", "Address", "Amount" };
+	private Object[][] previousTransactions;
+	private String[] transactionColumns = { "Date and Time", "Status", "To/From Address", "Amount" };
 	private SpartaGoldNode peer;
+	private ArrayList<Transaction> myTransactionsList;
 
 	/**
 	 * Launch the application.
@@ -130,9 +134,9 @@ public class WalletGUI
 		tabbedPane.setBackgroundAt(1, Color.WHITE);
 		transactions.setLayout(null);
 
+		fillTransactionTable();
 		table = new JTable(previousTransactions, transactionColumns);
 		table.setShowHorizontalLines(false);
-		//TODO get my transactions using peer.getMyTransactions() and display in the table
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(5, 5, 605, 250);
@@ -275,6 +279,31 @@ public class WalletGUI
 		
 
 		// GUI end
+	}
+
+	private void fillTransactionTable() {
+		myTransactionsList = peer.getMyTransactions();
+		previousTransactions = new Object[myTransactionsList.size()][4];
+		for (int i = 0; i < myTransactionsList.size(); i++)
+		{
+			previousTransactions[i][0] = myTransactionsList.get(i).getDate();
+			if (myTransactionsList.get(i).getSenderPubKey() == peer.readPubKey())
+				{
+					previousTransactions[i][1] = "Sent";
+					previousTransactions[i][2] = myTransactionsList.get(i).getReceiverPubKey();
+				}
+			else if (myTransactionsList.get(i).getReceiverPubKey() == peer.readPubKey())
+				{
+					previousTransactions[i][1] = "Received";
+					previousTransactions[i][2] = peer.readPubKey();
+				}
+			else
+				{
+					previousTransactions[i][1] = "Unknown";
+					previousTransactions[i][2] = myTransactionsList.get(i).getSenderPubKey();
+				}
+			previousTransactions[i][3] = myTransactionsList.get(i).getAmount();
+		}
 	}
 
 	public static String getIpAddress()
