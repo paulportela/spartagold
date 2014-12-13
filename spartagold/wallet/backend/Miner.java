@@ -1,6 +1,8 @@
 package spartagold.wallet.backend;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 import spartagold.framework.LoggerUtil;
 
 /**
@@ -22,29 +24,29 @@ public class Miner implements Runnable
 	private Block block;
 	private String solution;
 	private Transaction change;
+	private Transaction unconfirmedTransaction;
 
 	public Miner(Transaction t) throws IOException
 	{
+		this.unconfirmedTransaction = t;
 		block = new Block();
-		block.addTransaction(t);
-		/** add this part back after genesis block is created
-		double total = t.getTransactionTotal() - t.getAmount();
-		t.setAmount(t.getAmount() - Block.FEE);
-		if(total > 0)
-		{
-			this.change = new Transaction(t.getSenderPubKey(), total);
-			block.addTransaction(change);
-		}
-		
-		solution = "";
 		LoggerUtil.getLogger().fine("Miner object created.");
-		*/
 	}
 
 	public void run()
 	{
 		try
 		{
+			block.addTransaction(unconfirmedTransaction);
+			double total = unconfirmedTransaction.getTransactionTotal() - unconfirmedTransaction.getAmount();
+			//t.setAmount(t.getAmount() - Block.FEE);
+			if(total > 0)
+			{
+				this.change = new Transaction(unconfirmedTransaction.getSenderPubKey(), total);
+				block.addTransaction(change);
+			}
+			
+			solution = "";
 			LoggerUtil.getLogger().fine("Finding solution...");
 			solution = ProofOfWork.findProof(block.toString());
 			block.setSolution(solution);
@@ -65,5 +67,6 @@ public class Miner implements Runnable
 	{
 		block.addTransaction(trans);
 	}
-
+	
+	
 }

@@ -17,7 +17,7 @@ import spartagold.framework.LoggerUtil;
 public class Verify
 {
 
-	public static final int NUMBER_OF_ZEROES = 15;
+	public static final int NUMBER_OF_ZEROES = 5;
 
 	/**
 	 * Verifies a transaction by checking if the sender has the funds to send
@@ -93,8 +93,7 @@ public class Verify
 	 * @return StringBuilder object containing the hashed data
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static StringBuilder hash(String data)
-			throws NoSuchAlgorithmException
+	public static StringBuilder hash(String data) throws NoSuchAlgorithmException
 	{
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		md.update(data.getBytes());

@@ -46,7 +46,7 @@ public class SpartaGoldNode extends Node implements Serializable
 	//File Names
 	private String blockFileName = "blockchain";
 
-	//private boolean mining;
+	private boolean mining;
 
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Transaction> myTransactions;
@@ -56,7 +56,7 @@ public class SpartaGoldNode extends Node implements Serializable
 	{
 		super(maxPeers, myInfo);
 		
-		//TODO Read blockchain from file
+		// Read blockchain from file
 		try
 		{
 			boolean checkBlockchainFile = new File(blockFileName).exists();
@@ -66,6 +66,10 @@ public class SpartaGoldNode extends Node implements Serializable
 				this.blockChain = (BlockChain) in.readObject();
 				in.close();
 			}
+			else
+			{
+				blockChain = new BlockChain();
+			}
 		} 
 		catch (Exception e)
 		{
@@ -73,11 +77,12 @@ public class SpartaGoldNode extends Node implements Serializable
 		}
 		
 		transactions = new ArrayList<Transaction>();
-		blockChain = new BlockChain();
 		myTransactions = new ArrayList<Transaction>();
 		initializeMyTransactions();
 		
-		//mining = false;
+		transactions.add(new Transaction("dsfads", 0));
+		
+		mining = false;
 
 		this.addRouter(new Router(this));
 
@@ -299,6 +304,11 @@ public class SpartaGoldNode extends Node implements Serializable
 			{
 				if(!blockChain.contains(b))
 				{
+					mining = false;
+					
+					//remove transaction from unconfirmed transactions
+					transactions.remove(b.getTransactions().get(1));
+					
 					ArrayList<String> unspentIds = b.getTransactions().get(1).getUnspentIds();
 					for (int i = 0; i < blockChain.getChainSize(); i++)
 					{
@@ -454,11 +464,21 @@ public class SpartaGoldNode extends Node implements Serializable
 			String pub = pubIn.next();
 			pubIn.close();
 			return pub;
-		} 
+		}
 		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public boolean isMining()
+	{
+		return mining;
+	}
+	
+	public void setMining(boolean b)
+	{
+		mining = b;
 	}
 }

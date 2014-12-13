@@ -121,19 +121,22 @@ public class Transaction
 
 	public void addUnspentIds(BlockChain bc)
 	{
-		for (int i = 0; i < bc.getChainSize(); i++)
+		if(amount > 0)
 		{
-			Block tempBlock = bc.getChain().get(i);
-			for (Transaction t : tempBlock.getTransactions())
+			for (int i = 0; i < bc.getChainSize(); i++)
 			{
-				if (t.getReceiverPubKey() == senderPubKey && t.isSpent() == false)
+				Block tempBlock = bc.getChain().get(i);
+				for (Transaction t : tempBlock.getTransactions())
 				{
-					transactionTotal += t.getAmount();
-					unspentIds.add(t.getID());
-				}
-				if (transactionTotal >= amount)
-				{
-					i = bc.getChainSize();
+					if (t.getReceiverPubKey() == senderPubKey && t.isSpent() == false)
+					{
+						transactionTotal += t.getAmount();
+						unspentIds.add(t.getID());
+					}
+					if (transactionTotal >= amount)
+					{
+						i = bc.getChainSize();
+					}
 				}
 			}
 		}
