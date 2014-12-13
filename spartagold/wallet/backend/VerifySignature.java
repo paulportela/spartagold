@@ -47,7 +47,7 @@ class VerifySignature
 			byte[] sigToVerify = signed;
 
 			/* create a Signature object and initialize it with the public key */
-			Signature sig = Signature.getInstance("SHA1withECDSA", "SUN");
+			Signature sig = Signature.getInstance("SHA1withECDSA");
 			sig.initVerify(pubKey);
 
 			/* Update and verify the data */
