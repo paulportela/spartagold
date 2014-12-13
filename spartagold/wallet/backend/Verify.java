@@ -46,18 +46,19 @@ public class Verify
 				{
 					for(int j = 0; j < unspentIds.size(); j++)
 					{
-						if (unspentIds.get(j) == t.getID())
+						if (unspentIds.get(j) == t.getID() && t.isSpent())
 						{
-							if (t.isSpent() == true)
-							{
-								return false;
-							}
+							return false;
 						}
 					}
 				}
 			}
+			return true;
 		}
-		return true;
+		else
+		{
+			return false;
+		}
 	}
 
 	/**

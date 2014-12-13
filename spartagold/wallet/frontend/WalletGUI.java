@@ -74,7 +74,7 @@ public class WalletGUI
 						LoggerUtil.getLogger().fine("Public and private keys generated.");
 					}
 					LoggerUtil.getLogger().fine("Connecting to SpartaGold network...");
-					WalletGUI window = new WalletGUI("localhost", 9005, 5,new PeerInfo("localhost", 9009));
+					WalletGUI window = new WalletGUI("localhost", 9002, 5,new PeerInfo("localhost", 9006));
 					window.frmSpartagoldWallet.setVisible(true);
 
 				} 
