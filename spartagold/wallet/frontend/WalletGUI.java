@@ -41,7 +41,6 @@ public class WalletGUI
 	private JFrame frmSpartagoldWallet;
 	private JTextField tfAmount;
 	private JTextField tfAddress;
-
 	private static String myIpAddress;
 	private double myBalance;
 	private JTable table;
@@ -98,11 +97,7 @@ public class WalletGUI
 		peer.buildPeers(initialhost, initialport, 2);
 		(new Thread(){public void run(){peer.mainLoop();}}).start();
 		
-		
-		myTransactionsList = peer.getMyTransactions();
-		myBalance = getBalance();
-
-		//Requesting blockchain from peers
+		LoggerUtil.getLogger().fine("Requesting block chain from peers...");
 		for (PeerInfo pid : peer.getAllPeers())
 		{
 			List<PeerMessage> msg = peer.connectAndSend(pid, SpartaGoldNode.GETBLOCKCHAIN, null, true);
@@ -110,6 +105,10 @@ public class WalletGUI
 			if(peer.getBlockChain().getChainSize() < bc.getChainSize())
 				peer.setBlockchain(bc);
 		}
+		
+		LoggerUtil.getLogger().fine("Fetching my transactions from block chain...");
+		myTransactionsList = peer.getMyTransactions();
+		myBalance = getBalance();
 
 		// GUI start
 		frmSpartagoldWallet = new JFrame();
@@ -122,6 +121,7 @@ public class WalletGUI
 		//frmSpartagoldWallet.setUndecorated(true);
 		frmSpartagoldWallet.addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent e) {
+		    	LoggerUtil.getLogger().fine("Saving block chain...");
 		    	peer.saveBlockchain();
 		    }
 		});
@@ -158,28 +158,38 @@ public class WalletGUI
 		tabbedPane.setBackgroundAt(2, Color.WHITE);
 		mine.setLayout(null);
 
+		JTextArea taMineFeed = new JTextArea(80, 80);
+		taMineFeed.setLineWrap(true);
+		taMineFeed.setWrapStyleWord(true);
+		taMineFeed.setText("To begin mining, click the gold button.");
+		taMineFeed.setRows(80);
+		taMineFeed.setBounds(10, 10, 314, 273);
+		mine.add(taMineFeed);
+		taMineFeed.setEditable(false);
+		//taMineFeed.append(str);
+		//taMineFeed.setCaretPosition(taMineFeed.getText().length() - 1);
 		
-		BufferedImage mineButtonIcon = ImageIO.read(new File("/img/mineButton.png"));
+		BufferedImage mineButtonIcon = ImageIO.read(new File("img/mineButton.png"));
 		JButton btnMine = new JButton(new ImageIcon(mineButtonIcon));
 		btnMine.setBorder(BorderFactory.createEmptyBorder());
 		btnMine.setContentAreaFilled(false);
-		btnMine.setBounds(196, 132, 200, 75);
+		btnMine.setBounds(370, 175, 200, 75);
 		mine.add(btnMine);
+		
 		btnMine.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0)
 			{
 				LoggerUtil.getLogger().fine("Mining for Gold selected. Creating Miner object...");
-				
 				Miner m = null;
 				
 				try
 				{
 					m = new Miner(peer.getTransaction());
 					Runnable r = m;
+					LoggerUtil.getLogger().fine("Runnable created. Creating thread...");
 					Thread t = new Thread(r);
 					t.start();
-					LoggerUtil.getLogger().fine("Mining has begun");
 				} 
 				catch (IOException e)
 				{
@@ -188,24 +198,11 @@ public class WalletGUI
 				
 				for (PeerInfo pid : peer.getAllPeers())
 				{
-					LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
+					LoggerUtil.getLogger().fine("Broadcasting...");
 					peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
 				}
 			}
 		});
-		
-
-		JButton btnStop = new JButton("Stop");
-		btnStop.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent arg0)
-			{
-				//TODO: stop mining
-				peer.setMining(false);
-			}
-		});
-		btnStop.setBounds(248, 218, 89, 23);
-		mine.add(btnStop);
 
 		JPanel panel = new JPanel();
 		panel.setBackground(UIManager.getColor("activeCaption"));
@@ -231,7 +228,7 @@ public class WalletGUI
 		lblBalance.setForeground(Color.BLACK);
 		lblBalance.setFont(new Font("Segoe UI Semibold", Font.BOLD, 20));
 
-		BufferedImage sendButtonIcon = ImageIO.read(new File("/img/sendButton.png"));
+		BufferedImage sendButtonIcon = ImageIO.read(new File("img/sendButton.png"));
 		JButton btnSend = new JButton(new ImageIcon(sendButtonIcon));
 		btnSend.setBorder(BorderFactory.createEmptyBorder());
 		btnSend.setContentAreaFilled(false);
@@ -248,7 +245,7 @@ public class WalletGUI
 					t.addUnspentIds(peer.getBlockChain());
 					for (PeerInfo pid : peer.getAllPeers())
 					{
-						LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
+						LoggerUtil.getLogger().fine("Broadcasting...");
 						peer.connectAndSendObject(pid, SpartaGoldNode.TRANSACTION, t);
 					}
 				}
@@ -283,7 +280,7 @@ public class WalletGUI
 		tfAddress.setColumns(10);
 		
 		
-		BufferedImage logo = ImageIO.read(new File("/img/spartagoldlogo02.png"));
+		BufferedImage logo = ImageIO.read(new File("img/spartagoldlogo02.png"));
 		Image scaledLogo = logo.getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH);
 		JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
 		logoLabel.setBounds(79, 170, 450, 112);
@@ -316,6 +313,7 @@ public class WalletGUI
 				}
 			previousTransactions[i][3] = myTransactionsList.get(i).getAmount();
 		}
+		LoggerUtil.getLogger().fine("Transaction table filled.");
 	}
 	
 	private double getBalance()
@@ -326,6 +324,7 @@ public class WalletGUI
 			if (t.getReceiverPubKey() == peer.readPubKey() && t.isSpent() == false)
 				balance += t.getAmount();
 		}
+		LoggerUtil.getLogger().fine("Balance: " + balance);
 		return balance;
 	}
 
