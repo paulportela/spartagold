@@ -306,7 +306,7 @@ public class Node
 
 			while (!shutdown) 
 			{
-				LoggerUtil.getLogger().fine("Listening...");
+				//LoggerUtil.getLogger().fine("Listening...");
 				try 
 				{
 					Socket clientsock = s.accept();
@@ -317,7 +317,7 @@ public class Node
 				}
 				catch (SocketTimeoutException e) 
 				{
-					LoggerUtil.getLogger().fine("" + e);
+					//LoggerUtil.getLogger().fine("" + e);
 					continue;
 				}
 			} // end while (!shutdown);

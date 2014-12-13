@@ -35,15 +35,18 @@ public class Miner implements Runnable
 
 	public void run()
 	{
+		LoggerUtil.getLogger().fine("Mining has begun.");
 		try
 		{
 			block.addTransaction(unconfirmedTransaction);
+			LoggerUtil.getLogger().fine("Transaction added to block.");
 			double total = unconfirmedTransaction.getTransactionTotal() - unconfirmedTransaction.getAmount();
 			//t.setAmount(t.getAmount() - Block.FEE);
 			if(total > 0)
 			{
 				this.change = new Transaction(unconfirmedTransaction.getSenderPubKey(), total);
 				block.addTransaction(change);
+				LoggerUtil.getLogger().fine("Change transaction added to block.");
 			}
 			
 			solution = "";
