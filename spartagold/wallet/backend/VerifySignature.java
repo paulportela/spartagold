@@ -3,8 +3,10 @@ package spartagold.wallet.backend;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+
 import org.apache.commons.codec.binary.Base64;
+
 import spartagold.framework.LoggerUtil;
 
 /**
@@ -36,7 +38,7 @@ class VerifySignature
 			Base64 decoder = new Base64();
 			byte[] pubArray = decoder.decode(senderPubKey);
 
-			PKCS8EncodedKeySpec pubKeySpec = new PKCS8EncodedKeySpec(pubArray);
+			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubArray);
 
 			KeyFactory keyFactory = KeyFactory.getInstance("EC");
 			PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
