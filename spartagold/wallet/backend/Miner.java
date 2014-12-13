@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import spartagold.framework.LoggerUtil;
+import spartagold.framework.PeerInfo;
 
 /**
  * Initiates proof-of-work and saves solution into a block object. Adds transaction
@@ -25,11 +26,14 @@ public class Miner implements Runnable
 	private String solution;
 	private Transaction change;
 	private Transaction unconfirmedTransaction;
+	private SpartaGoldNode peer;
 
-	public Miner(Transaction t) throws IOException
+	public Miner(SpartaGoldNode peer) throws IOException
 	{
-		this.unconfirmedTransaction = t;
+		this.peer = peer;
+		this.unconfirmedTransaction = peer.getTransaction();
 		block = new Block();
+		this.solution = null;
 		LoggerUtil.getLogger().fine("Miner object created.");
 	}
 
@@ -49,11 +53,16 @@ public class Miner implements Runnable
 				LoggerUtil.getLogger().fine("Change transaction added to block.");
 			}
 			
-			solution = "";
 			LoggerUtil.getLogger().fine("Finding solution...");
 			solution = ProofOfWork.findProof(block.toString());
 			block.setSolution(solution);
 			LoggerUtil.getLogger().fine("Solution has been set in block.");
+			
+			for (PeerInfo pid : peer.getAllPeers())
+			{
+				LoggerUtil.getLogger().fine("Broadcasting...");
+				peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, block);
+			}
 		} 
 		catch (Exception e)
 		{

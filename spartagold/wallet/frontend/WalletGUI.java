@@ -75,7 +75,7 @@ public class WalletGUI
 					}
 					LoggerUtil.getLogger().fine("Connecting to SpartaGold network...");
 					
-					WalletGUI window = new WalletGUI("localhost", 9002, 5,new PeerInfo("localhost", 9006));
+					WalletGUI window = new WalletGUI("localhost", 9004, 5,new PeerInfo("localhost", 9005));
 					
 					window.frmSpartagoldWallet.setVisible(true);
 
@@ -186,7 +186,7 @@ public class WalletGUI
 				
 				try
 				{
-					m = new Miner(peer.getTransaction());
+					m = new Miner(peer);
 					Runnable r = m;
 					LoggerUtil.getLogger().fine("Runnable created. Creating thread...");
 					Thread t = new Thread(r);
@@ -196,12 +196,11 @@ public class WalletGUI
 				{
 					e.printStackTrace();
 				}
-				
-				for (PeerInfo pid : peer.getAllPeers())
-				{
-					LoggerUtil.getLogger().fine("Broadcasting...");
-					peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
-				}
+//				for (PeerInfo pid : peer.getAllPeers())
+//				{
+//					LoggerUtil.getLogger().fine("Broadcasting...");
+//					peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
+//				}
 			}
 		});
 

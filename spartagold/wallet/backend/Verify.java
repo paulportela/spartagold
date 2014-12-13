@@ -69,14 +69,12 @@ public class Verify
 	 * @return a boolean value of the status of verification
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static boolean verifyBlock(Block block)
-			throws NoSuchAlgorithmException
+	public static boolean verifyBlock(Block block) throws NoSuchAlgorithmException
 	{
 		String zeros = new String(new char[NUMBER_OF_ZEROES]).replace("\0", "0");
 		String solution = block.getSolution();
 		String blockString = block.toString();
-		String hash = hash(blockString + solution).toString();
-
+		String hash = hash(blockString + solution).toString().substring(0, NUMBER_OF_ZEROES);
 		if (zeros.equals(hash))
 		{
 			LoggerUtil.getLogger().fine("Block verified.");
