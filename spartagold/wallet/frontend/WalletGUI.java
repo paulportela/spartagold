@@ -75,7 +75,7 @@ public class WalletGUI
 						LoggerUtil.getLogger().fine("Public and private keys generated.");
 					}
 					LoggerUtil.getLogger().fine("Connecting to SpartaGold network...");
-					WalletGUI window = new WalletGUI("localhost", 9002, 5,new PeerInfo("localhost", 9004));
+					WalletGUI window = new WalletGUI("localhost", 9005, 5,new PeerInfo("localhost", 9009));
 					window.frmSpartagoldWallet.setVisible(true);
 
 				} 
@@ -102,14 +102,14 @@ public class WalletGUI
 		myTransactionsList = peer.getMyTransactions();
 		myBalance = getBalance();
 
-		//Requesting blockchain from peers
-		for (PeerInfo pid : peer.getAllPeers())
-		{
-			List<PeerMessage> msg = peer.connectAndSend(pid, SpartaGoldNode.GETBLOCKCHAIN, null, true);
-			BlockChain bc = (BlockChain) SerializationUtils.deserialize(msg.get(0).getMsgDataBytes());
-			if(peer.getBlockChain().getChainSize() < bc.getChainSize())
-				peer.setBlockchain(bc);
-		}
+//		//Requesting blockchain from peers
+//		for (PeerInfo pid : peer.getAllPeers())
+//		{
+//			List<PeerMessage> msg = peer.connectAndSend(pid, SpartaGoldNode.GETBLOCKCHAIN, null, true);
+//			BlockChain bc = (BlockChain) SerializationUtils.deserialize(msg.get(0).getMsgDataBytes());
+//			if(peer.getBlockChain().getChainSize() < bc.getChainSize())
+//				peer.setBlockchain(bc);
+//		}
 
 		// GUI start
 		frmSpartagoldWallet = new JFrame();
@@ -159,7 +159,7 @@ public class WalletGUI
 		mine.setLayout(null);
 
 		
-		BufferedImage mineButtonIcon = ImageIO.read(new File("/img/mineButton.png"));
+		BufferedImage mineButtonIcon = ImageIO.read(new File("img/mineButton.png"));
 		JButton btnMine = new JButton(new ImageIcon(mineButtonIcon));
 		btnMine.setBorder(BorderFactory.createEmptyBorder());
 		btnMine.setContentAreaFilled(false);
@@ -231,7 +231,7 @@ public class WalletGUI
 		lblBalance.setForeground(Color.BLACK);
 		lblBalance.setFont(new Font("Segoe UI Semibold", Font.BOLD, 20));
 
-		BufferedImage sendButtonIcon = ImageIO.read(new File("/img/sendButton.png"));
+		BufferedImage sendButtonIcon = ImageIO.read(new File("img/sendButton.png"));
 		JButton btnSend = new JButton(new ImageIcon(sendButtonIcon));
 		btnSend.setBorder(BorderFactory.createEmptyBorder());
 		btnSend.setContentAreaFilled(false);
@@ -283,7 +283,7 @@ public class WalletGUI
 		tfAddress.setColumns(10);
 		
 		
-		BufferedImage logo = ImageIO.read(new File("/img/spartagoldlogo02.png"));
+		BufferedImage logo = ImageIO.read(new File("img/spartagoldlogo02.png"));
 		Image scaledLogo = logo.getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH);
 		JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
 		logoLabel.setBounds(79, 170, 450, 112);

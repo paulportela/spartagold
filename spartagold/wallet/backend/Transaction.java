@@ -2,6 +2,7 @@ package spartagold.wallet.backend;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import spartagold.framework.LoggerUtil;
  * @version 1.0.0
  */
 
-public class Transaction
+public class Transaction implements Serializable
 {
 	private String trans;
 	private String senderPubKey;
