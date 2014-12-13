@@ -93,4 +93,17 @@ public class Block implements Serializable
 				+ ", previousBlockID=" + previousBlockID + ", trans="
 				+ transactionList + "]";
 	}
+	
+	@Override
+    public boolean equals(Object object)
+    {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof Block)
+        {
+            sameSame = this.id.equals(((Block) object).id);
+        }
+
+        return sameSame;
+    }
 }

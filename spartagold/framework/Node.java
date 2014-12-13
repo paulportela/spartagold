@@ -241,7 +241,7 @@ public class Node
 			PeerConnection peerconn = new PeerConnection(pd);
 			PeerMessage tosend = new PeerMessage(msgtype, data);
 			peerconn.sendData(tosend);
-			LoggerUtil.getLogger().fine("Sent " + tosend + "/" + peerconn);
+			LoggerUtil.getLogger().fine("Sent " + tosend.getMsgType() + "/" + peerconn);
 			
 			peerconn.close();
 		}
@@ -270,7 +270,7 @@ public class Node
 			PeerConnection peerconn = new PeerConnection(pd);
 			PeerMessage tosend = new PeerMessage(msgtype, msgdata);
 			peerconn.sendData(tosend);
-			LoggerUtil.getLogger().fine("Sent " + tosend + "/" + peerconn);
+			LoggerUtil.getLogger().fine("Sent " + tosend.getMsgType() + "/" + peerconn);
 			if (waitreply) 
 			{
 				PeerMessage onereply = peerconn.recvData();

@@ -361,7 +361,7 @@ public class SpartaGoldNode extends Node implements Serializable
 			{
 				e.printStackTrace();
 			}
-			
+			System.out.println("Transaction ------------------------------------------------------>" + valid);
 			if (!transactions.contains(t) && valid)
 			{
 				transactions.add(t);

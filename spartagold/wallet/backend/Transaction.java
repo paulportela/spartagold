@@ -164,4 +164,17 @@ public class Transaction implements Serializable
 		return date;
 	}
 	
+	@Override
+    public boolean equals(Object object)
+    {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof Transaction)
+        {
+            sameSame = this.id.equals(((Transaction) object).id);
+        }
+
+        return sameSame;
+    }
+	
 }
