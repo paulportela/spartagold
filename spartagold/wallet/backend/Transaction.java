@@ -21,6 +21,7 @@ import spartagold.framework.LoggerUtil;
  * @version 1.0.0
  */
 
+@SuppressWarnings("serial")
 public class Transaction implements Serializable
 {
 	private String trans;
@@ -129,7 +130,7 @@ public class Transaction implements Serializable
 				Block tempBlock = bc.getChain().get(i);
 				for (Transaction t : tempBlock.getTransactions())
 				{
-					if (t.getReceiverPubKey() == senderPubKey && t.isSpent() == false)
+					if (t.getReceiverPubKey() == senderPubKey && !t.isSpent())
 					{
 						transactionTotal += t.getAmount();
 						unspentIds.add(t.getID());
@@ -163,18 +164,5 @@ public class Transaction implements Serializable
 	{
 		return date;
 	}
-	
-	@Override
-    public boolean equals(Object object)
-    {
-        boolean sameSame = false;
-
-        if (object != null && object instanceof Transaction)
-        {
-            sameSame = this.id.equals(((Transaction) object).id);
-        }
-
-        return sameSame;
-    }
 	
 }
