@@ -287,14 +287,15 @@ public class SpartaGoldNode extends Node implements Serializable
 
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
-			LoggerUtil.getLogger().fine("FOUNDSOLUTION message received. Deserializing...");
+			System.out.println("SolutionFoundHandler: FOUNDSOLUTION message received. Deserializing...");
 			Block b = (Block) SerializationUtils.deserialize(msg.getMsgDataBytes());
 
 			boolean solution = false;
 			try
 			{
-				LoggerUtil.getLogger().fine("Verifying block...");
+				System.out.println("SolutionFoundHandler: Verifying block...");
 				solution = Verify.verifyBlock(b);
+				System.out.println("SolutionFoundHandler: Block verification: " + solution);
 			}
 			catch (NoSuchAlgorithmException e)
 			{
@@ -309,27 +310,38 @@ public class SpartaGoldNode extends Node implements Serializable
 			{
 				if (!blockChain.contains(b))
 				{
+					System.out.println("SolutionFoundHandler: Block not in block chain yet.");
 					mining = false;
 
 					// remove transaction from unconfirmed transactions
+					System.out.println("SolutionFoundHandler: Removing second transaction (non-reward) from this.transactions.");
 					transactions.remove(b.getTransactions().get(1));
 
+					System.out.println("SolutionFoundHandler: Creating unspentIds list from second transaction.");
 					ArrayList<String> unspentIds = b.getTransactions().get(1).getUnspentIds();
 					for (int i = 0; i < blockChain.getChainSize(); i++)
 					{
 						Block tempBlock = blockChain.getChain().get(i);
+						System.out.println("SolutionFoundHandler: Block ID: " + tempBlock.getId());
+						System.out.println("SolutionFoundHandler: Block solution: " + tempBlock.getSolution());
 						for (Transaction t : tempBlock.getTransactions())
 						{
+							System.out.println("SolutionFoundHandler: Transaction ID: " + t.getID());
+							System.out.println("SolutionFoundHandler: Transaction amount: " + t.getAmount());
 							innerloop: for (String id : unspentIds)
 							{
+								System.out.println("SolutionFoundHandler: Unspent ID: " + id);
 								if (id == t.getID())
 								{
+									System.out.println("SolutionFoundHandler: Unspent ID matches transaction ID.");
 									t.setSpent(true);
+									System.out.println("SolutionFoundHandler: Transaction sent to spent.");
 								}
 								break innerloop;
 							}
 						}
 					}
+					System.out.println("SolutionFoundHandler: Adding block to block chain.");
 					blockChain.addBlock(b);
 					for (PeerInfo pid : peer.getAllPeers())
 					{
@@ -352,13 +364,13 @@ public class SpartaGoldNode extends Node implements Serializable
 
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
-			LoggerUtil.getLogger().fine("TRANSACTION message received. Deserializing...");
+			System.out.println("TransactionHandler: TRANSACTION message received. Deserializing...");
 			Transaction t = (Transaction) SerializationUtils.deserialize(msg.getMsgDataBytes());
 
 			boolean valid = false;
 			try
 			{
-				LoggerUtil.getLogger().fine("Verifying transaction...");
+				System.out.println("TransactionHandler: Verifying transaction...");
 				valid = Verify.verifyTransaction(t, blockChain);
 			}
 			catch (Exception e)
@@ -367,12 +379,17 @@ public class SpartaGoldNode extends Node implements Serializable
 			}
 			if (!transactions.contains(t) && valid)
 			{
+				System.out.println("TransactionHandler: Transaction is verified and not added to transactions.");
 				transactions.add(t);
-				System.out.println("Transaction Added: " + t.getAmount());
+				System.out.println("TransactionHandler: Added transaction amount: " + t.getAmount());
 				// Read in public key
 				String pub = readPubKey();
 				if (pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
+				{
+					System.out.println("TransactionHandler: my public key matches receiver or sender public key.");
+					System.out.println("TransactionHandler: Adding transaction to myTransactions");
 					myTransactions.add(t);
+				}
 
 				for (PeerInfo pid : peer.getAllPeers())
 				{
