@@ -119,7 +119,6 @@ public class WalletGUI
 		}).start();
 
 		myTransactionsList = peer.getMyTransactions();
-		myBalance = getBalance();
 
 		// //Requesting blockchain from peers
 		// for (PeerInfo pid : peer.getAllPeers())
@@ -204,21 +203,23 @@ public class WalletGUI
 		{
 			public void actionPerformed(ActionEvent arg0)
 			{
-				LoggerUtil.getLogger().fine("Mining for Gold selected. Creating Miner object...");
+				System.out.println("Mining for Gold selected. Creating Miner object...");
 				Miner m = null;
+				System.out.println("Miner.java: my balance: " + peer.getBalance());
 				try
 				{
 					m = new Miner(peer);
+					System.out.println("WalletGUI trying to mine if this is true: " + m.hasATransactionToVerify());
 					if (m.hasATransactionToVerify())
 					{
 						Runnable r = m;
-						LoggerUtil.getLogger().fine("Runnable created. Creating thread...");
+						System.out.println("Runnable created. Creating thread...");
 						Thread t = new Thread(r);
 						t.start();
 					}
 					else
 					{
-						LoggerUtil.getLogger().fine("Currently there are no transactions to comfirm");
+						System.out.println("Currently there are no transactions to comfirm");
 					}
 				}
 				catch (IOException e)
@@ -319,12 +320,12 @@ public class WalletGUI
 		for (int i = 0; i < myTransactionsList.size(); i++)
 		{
 			previousTransactions[i][0] = myTransactionsList.get(i).getDate();
-			if (myTransactionsList.get(i).getSenderPubKey() == peer.readPubKey())
+			if (myTransactionsList.get(i).getSenderPubKey().equals(peer.readPubKey()))
 			{
 				previousTransactions[i][1] = "Sent";
 				previousTransactions[i][2] = myTransactionsList.get(i).getReceiverPubKey();
 			}
-			else if (myTransactionsList.get(i).getReceiverPubKey() == peer.readPubKey())
+			else if (myTransactionsList.get(i).getReceiverPubKey().equals(peer.readPubKey()))
 			{
 				previousTransactions[i][1] = "Received";
 				previousTransactions[i][2] = peer.readPubKey();
@@ -337,18 +338,6 @@ public class WalletGUI
 			previousTransactions[i][3] = myTransactionsList.get(i).getAmount();
 		}
 		LoggerUtil.getLogger().fine("Transaction table filled.");
-	}
-
-	private double getBalance()
-	{
-		double balance = 0;
-		for (Transaction t : myTransactionsList)
-		{
-			if (t.getReceiverPubKey() == peer.readPubKey() && t.isSpent() == false)
-				balance += t.getAmount();
-		}
-		LoggerUtil.getLogger().fine("Balance: " + balance);
-		return balance;
 	}
 
 	public static String getIpAddress()

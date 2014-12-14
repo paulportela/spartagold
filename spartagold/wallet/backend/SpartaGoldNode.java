@@ -328,16 +328,16 @@ public class SpartaGoldNode extends Node implements Serializable
 						{
 							System.out.println("SolutionFoundHandler: Transaction ID: " + t.getID());
 							System.out.println("SolutionFoundHandler: Transaction amount: " + t.getAmount());
-							innerloop: for (String id : unspentIds)
+							System.out.println("SolutionFoundHandler: All unspentIds: " + unspentIds);
+							for (String id : unspentIds)
 							{
 								System.out.println("SolutionFoundHandler: Unspent ID: " + id);
-								if (id == t.getID())
+								if (id.equals(t.getID()))
 								{
 									System.out.println("SolutionFoundHandler: Unspent ID matches transaction ID.");
 									t.setSpent(true);
-									System.out.println("SolutionFoundHandler: Transaction sent to spent.");
+									System.out.println("SolutionFoundHandler: Transaction set to spent.");
 								}
-								break innerloop;
 							}
 						}
 					}
@@ -345,9 +345,10 @@ public class SpartaGoldNode extends Node implements Serializable
 					blockChain.addBlock(b);
 					for (PeerInfo pid : peer.getAllPeers())
 					{
-						LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
+						System.out.println("Broadcasting to " + pid.toString());
 						peer.connectAndSendObject(pid, FOUNDSOLUTION, b);
 					}
+					System.out.println("Miner.java: my balance: " + getBalance());
 				}
 			}
 		}
@@ -384,7 +385,7 @@ public class SpartaGoldNode extends Node implements Serializable
 				System.out.println("TransactionHandler: Added transaction amount: " + t.getAmount());
 				// Read in public key
 				String pub = readPubKey();
-				if (pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
+				if (pub.equals(t.getReceiverPubKey()) || pub.equals(t.getSenderPubKey()))
 				{
 					System.out.println("TransactionHandler: my public key matches receiver or sender public key.");
 					System.out.println("TransactionHandler: Adding transaction to myTransactions");
@@ -472,7 +473,7 @@ public class SpartaGoldNode extends Node implements Serializable
 			Block tempBlock = blockChain.getChain().get(i);
 			for (Transaction t : tempBlock.getTransactions())
 			{
-				if (pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
+				if (pub.equals(t.getReceiverPubKey()) || pub.equals(t.getSenderPubKey()))
 					myTransactions.add(t);
 			}
 		}
@@ -513,5 +514,20 @@ public class SpartaGoldNode extends Node implements Serializable
 	public String getStatus()
 	{
 		return status;
+	}
+
+	public double getBalance()
+	{
+		double balance = 0;
+		for (int i = 0; i < blockChain.getChainSize(); i++)
+		{
+			Block tempBlock = blockChain.getChain().get(i);
+			for (Transaction t : tempBlock.getTransactions())
+			{
+				if (t.getReceiverPubKey().equals(readPubKey()) && t.isSpent() == false)
+					balance += t.getAmount();
+			}
+		}
+		return balance;
 	}
 }

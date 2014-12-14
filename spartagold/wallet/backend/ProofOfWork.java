@@ -30,8 +30,8 @@ public class ProofOfWork extends Thread
 
 		while (!isFound)
 		{
-			LoggerUtil.getLogger().fine("Checking hash.");
 			String hashedString = Verify.hash(concatString + i).substring(0, Verify.NUMBER_OF_ZEROES);
+			System.out.println("Checking hash: " + hashedString);
 			if (hashedString.equals(zeroes))
 			{
 				isFound = true;

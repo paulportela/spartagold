@@ -34,12 +34,12 @@ public class Miner implements Runnable
 		System.out.println("Miner.java: peer.getTransaction() called");
 		block = new Block();
 		this.solution = null;
-		LoggerUtil.getLogger().fine("Miner object created.");
+		System.out.println("Miner object created.");
 	}
 
 	public void run()
 	{
-		LoggerUtil.getLogger().fine("Mining has begun.");
+		System.out.println("Mining has begun.");
 		peer.setStatus("Mining has begun.");
 		try
 		{
@@ -52,7 +52,7 @@ public class Miner implements Runnable
 			{
 				change = new Transaction(unconfirmedTransaction.getSenderPubKey(), total);
 				block.addTransaction(change);
-				LoggerUtil.getLogger().fine("Change transaction added to block.");
+				System.out.println("Change transaction added to block.");
 			}
 
 			LoggerUtil.getLogger().fine("Finding solution...");

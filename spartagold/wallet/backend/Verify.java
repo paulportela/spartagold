@@ -50,13 +50,15 @@ public class Verify
 				System.out.println("Verify: Block solution: " + tempBlock.getSolution());
 				for (Transaction t : tempBlock.getTransactions())
 				{
+					if (unspentIds == null)
+						return false;
 					System.out.println("Verify: Transaction ID: " + t.getID());
 					System.out.println("Verify: Transaction amount: " + t.getAmount());
 					System.out.println("Verify: UnspentIds size: " + unspentIds.size());
 					for (int j = 0; j < unspentIds.size(); j++)
 					{
 						System.out.println("Verify: UnspentId: " + unspentIds.get(j));
-						if (unspentIds.get(j) == t.getID())
+						if (unspentIds.get(j).equals(t.getID()))
 						{
 							System.out.println("Verify: unspent ID matches transaction ID");
 							if (t.isSpent())
