@@ -1,7 +1,9 @@
 package spartagold.wallet.backend;
 
-import java.io.*;
-import java.security.*;
+import java.io.File;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Scanner;
 
@@ -10,7 +12,8 @@ import org.apache.commons.codec.binary.Base64;
 import spartagold.framework.LoggerUtil;
 
 /**
- * Signs a transaction string using an EC private key and SHA-1. Decodes private key with base 64.
+ * Signs a transaction string using an EC private key and SHA-1. Decodes private
+ * key with base 64.
  * 
  * @author Art Tucay Jr., Paul Portela
  * @version 1.0.0
@@ -56,7 +59,7 @@ public class SignTransaction
 			LoggerUtil.getLogger().fine("Transaction signed with private key.");
 			return realSig;
 
-		} 
+		}
 		catch (Exception e)
 		{
 			System.err.println("Caught exception " + e.toString());

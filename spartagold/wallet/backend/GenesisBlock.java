@@ -17,7 +17,7 @@ public class GenesisBlock
 		b.addTransaction(t);
 		bc.addBlock(b);
 	}
-	
+
 	public BlockChain getGenesisBlock()
 	{
 		return bc;

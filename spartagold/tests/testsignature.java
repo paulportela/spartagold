@@ -1,12 +1,16 @@
-package spartagold.wallet.backend;
+package spartagold.tests;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class testsignature {
+import spartagold.wallet.backend.SignTransaction;
 
-	public static void main(String[] args) {
+public class testsignature
+{
+
+	public static void main(String[] args)
+	{
 		System.out.println("Signing string: qwerty");
 		String str = "qwerty";
 		byte[] signed = SignTransaction.sign(str);

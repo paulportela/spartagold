@@ -11,6 +11,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import org.apache.commons.lang3.SerializationUtils;
+
 import spartagold.framework.HandlerInterface;
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.Node;
@@ -18,10 +21,10 @@ import spartagold.framework.PeerConnection;
 import spartagold.framework.PeerInfo;
 import spartagold.framework.PeerMessage;
 import spartagold.framework.RouterInterface;
-import org.apache.commons.lang3.SerializationUtils;
 
 /**
- * Contains all handlers of all types of messages received through the P2P network.
+ * Contains all handlers of all types of messages received through the P2P
+ * network.
  * 
  * @author Art Tucay Jr., Paul Portela
  * @version 1.0.0
@@ -42,8 +45,8 @@ public class SpartaGoldNode extends Node implements Serializable
 
 	public static final String REPLY = "REPL";
 	public static final String ERROR = "ERRO";
-	
-	//File Names
+
+	// File Names
 	private String blockFileName = "blockchain";
 
 	private boolean mining;
@@ -52,15 +55,17 @@ public class SpartaGoldNode extends Node implements Serializable
 	private ArrayList<Transaction> myTransactions;
 	private BlockChain blockChain;
 
+	private String status;
+
 	public SpartaGoldNode(int maxPeers, PeerInfo myInfo)
 	{
 		super(maxPeers, myInfo);
-		
+
 		// Read blockchain from file
 		try
 		{
 			boolean checkBlockchainFile = new File(blockFileName).exists();
-			if(checkBlockchainFile)
+			if (checkBlockchainFile)
 			{
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(blockFileName));
 				this.blockChain = (BlockChain) in.readObject();
@@ -70,18 +75,18 @@ public class SpartaGoldNode extends Node implements Serializable
 			{
 				blockChain = new BlockChain();
 			}
-		} 
+		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
+
 		transactions = new ArrayList<Transaction>();
 		myTransactions = new ArrayList<Transaction>();
 		initializeMyTransactions();
-		
-		transactions.add(new Transaction("dsfads", 0));
-		
+
+		// transactions.add(new Transaction("dsfads", 0));
+
 		mining = false;
 
 		this.addRouter(new Router(this));
@@ -103,9 +108,12 @@ public class SpartaGoldNode extends Node implements Serializable
 	 * peer. Then it connects with those peers doing a depth first search in
 	 * that list.
 	 * 
-	 * @param host the IP address of the peer
-	 * @param port the port the peer is listening on
-	 * @param hops the hops this peer will travel to build its peer list
+	 * @param host
+	 *            the IP address of the peer
+	 * @param port
+	 *            the port the peer is listening on
+	 * @param hops
+	 *            the hops this peer will travel to build its peer list
 	 */
 	public void buildPeers(String host, int port, int hops)
 	{
@@ -121,8 +129,7 @@ public class SpartaGoldNode extends Node implements Serializable
 		LoggerUtil.getLogger().fine("contacted " + peerid);
 		pd.setId(peerid);
 
-		String resp = this.connectAndSend(pd, INSERTPEER, String.format("%s %s %d", this.getId(), this.getHost(),
-								this.getPort()), true).get(0).getMsgType();
+		String resp = this.connectAndSend(pd, INSERTPEER, String.format("%s %s %d", this.getId(), this.getHost(), this.getPort()), true).get(0).getMsgType();
 		if (!resp.equals(REPLY) || this.getPeerKeys().contains(peerid))
 			return;
 
@@ -213,13 +220,10 @@ public class SpartaGoldNode extends Node implements Serializable
 
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
-			peerconn.sendData(new PeerMessage(REPLY, String.format("%d",
-					peer.getNumberOfPeers())));
+			peerconn.sendData(new PeerMessage(REPLY, String.format("%d", peer.getNumberOfPeers())));
 			for (String pid : peer.getPeerKeys())
 			{
-				peerconn.sendData(new PeerMessage(REPLY, String.format(
-						"%s %s %d", pid, peer.getPeer(pid).getHost(), peer
-								.getPeer(pid).getPort())));
+				peerconn.sendData(new PeerMessage(REPLY, String.format("%s %s %d", pid, peer.getPeer(pid).getHost(), peer.getPeer(pid).getPort())));
 			}
 		}
 	}
@@ -261,7 +265,8 @@ public class SpartaGoldNode extends Node implements Serializable
 			{
 				// Doesn't do anything
 				return;
-			} else
+			}
+			else
 			{
 				peer.removePeer(pid);
 			}
@@ -284,13 +289,13 @@ public class SpartaGoldNode extends Node implements Serializable
 		{
 			LoggerUtil.getLogger().fine("FOUNDSOLUTION message received. Deserializing...");
 			Block b = (Block) SerializationUtils.deserialize(msg.getMsgDataBytes());
-			
+
 			boolean solution = false;
 			try
 			{
 				LoggerUtil.getLogger().fine("Verifying block...");
 				solution = Verify.verifyBlock(b);
-			} 
+			}
 			catch (NoSuchAlgorithmException e)
 			{
 				e.printStackTrace();
@@ -302,23 +307,22 @@ public class SpartaGoldNode extends Node implements Serializable
 			}
 			else
 			{
-				if(!blockChain.contains(b))
+				if (!blockChain.contains(b))
 				{
 					mining = false;
-					
-					//remove transaction from unconfirmed transactions
+
+					// remove transaction from unconfirmed transactions
 					transactions.remove(b.getTransactions().get(1));
-					
+
 					ArrayList<String> unspentIds = b.getTransactions().get(1).getUnspentIds();
 					for (int i = 0; i < blockChain.getChainSize(); i++)
 					{
 						Block tempBlock = blockChain.getChain().get(i);
 						for (Transaction t : tempBlock.getTransactions())
 						{
-							innerloop:
-							for(String id: unspentIds)
+							innerloop: for (String id : unspentIds)
 							{
-								if(id == t.getID())
+								if (id == t.getID())
 								{
 									t.setSpent(true);
 								}
@@ -330,7 +334,7 @@ public class SpartaGoldNode extends Node implements Serializable
 					for (PeerInfo pid : peer.getAllPeers())
 					{
 						LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
-						peer.connectAndSendObject(pid, FOUNDSOLUTION , b);
+						peer.connectAndSendObject(pid, FOUNDSOLUTION, b);
 					}
 				}
 			}
@@ -350,13 +354,13 @@ public class SpartaGoldNode extends Node implements Serializable
 		{
 			LoggerUtil.getLogger().fine("TRANSACTION message received. Deserializing...");
 			Transaction t = (Transaction) SerializationUtils.deserialize(msg.getMsgDataBytes());
-			
+
 			boolean valid = false;
 			try
 			{
 				LoggerUtil.getLogger().fine("Verifying transaction...");
 				valid = Verify.verifyTransaction(t, blockChain);
-			} 
+			}
 			catch (Exception e)
 			{
 				e.printStackTrace();
@@ -364,18 +368,18 @@ public class SpartaGoldNode extends Node implements Serializable
 			if (!transactions.contains(t) && valid)
 			{
 				transactions.add(t);
-				
-				//Read in public key
+				System.out.println("Transaction Added: " + t.getAmount());
+				// Read in public key
 				String pub = readPubKey();
-				if(pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
+				if (pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
 					myTransactions.add(t);
-				
+
 				for (PeerInfo pid : peer.getAllPeers())
 				{
 					LoggerUtil.getLogger().fine("Broadcasting to " + pid.toString());
 					peer.connectAndSendObject(pid, TRANSACTION, t);
 				}
-			} 
+			}
 			else
 			{
 				peerconn.sendData(new PeerMessage(ERROR, "Transaction not verified."));
@@ -385,7 +389,7 @@ public class SpartaGoldNode extends Node implements Serializable
 
 	/**
 	 * Sending someone my BlockChain
-	 *
+	 * 
 	 */
 	private class BlockChainHandler implements HandlerInterface
 	{
@@ -400,27 +404,30 @@ public class SpartaGoldNode extends Node implements Serializable
 		public void handleMessage(PeerConnection peerconn, PeerMessage msg)
 		{
 			byte[] dataObject = SerializationUtils.serialize(blockChain);
-			// TODO Compare sizes of blockchain also figure out how to send a request ledger when gui starts up
+			// TODO Compare sizes of blockchain also figure out how to send a
+			// request ledger when gui starts up
 			peerconn.sendData(new PeerMessage(REPLY, dataObject));
 		}
 	}
-	
-	public Transaction getTransaction() 
+
+	public Transaction getTransaction()
 	{
-		if(!transactions.isEmpty()) return transactions.get(0);
-		else return null;
+		if (!transactions.isEmpty())
+			return transactions.get(0);
+		else
+			return null;
 	}
-	
+
 	public BlockChain getBlockChain()
 	{
 		return blockChain;
 	}
-	
+
 	public void setBlockchain(BlockChain bc)
 	{
 		this.blockChain = bc;
 	}
-	
+
 	public void saveBlockchain()
 	{
 		try
@@ -428,18 +435,18 @@ public class SpartaGoldNode extends Node implements Serializable
 			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(blockFileName));
 			out.writeObject(this.blockChain);
 			out.close();
-		} 
+		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-	
+
 	public ArrayList<Transaction> getMyTransactions()
 	{
 		return myTransactions;
 	}
-	
+
 	public void initializeMyTransactions()
 	{
 		String pub = readPubKey();
@@ -448,12 +455,12 @@ public class SpartaGoldNode extends Node implements Serializable
 			Block tempBlock = blockChain.getChain().get(i);
 			for (Transaction t : tempBlock.getTransactions())
 			{
-				if(pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
+				if (pub == t.getReceiverPubKey() || pub == t.getSenderPubKey())
 					myTransactions.add(t);
 			}
 		}
 	}
-	
+
 	public String readPubKey()
 	{
 		Scanner pubIn;
@@ -470,14 +477,24 @@ public class SpartaGoldNode extends Node implements Serializable
 		}
 		return null;
 	}
-	
+
 	public boolean isMining()
 	{
 		return mining;
 	}
-	
+
 	public void setMining(boolean b)
 	{
 		mining = b;
+	}
+
+	public void setStatus(String s)
+	{
+		status = s;
+	}
+
+	public String getStatus()
+	{
+		return status;
 	}
 }

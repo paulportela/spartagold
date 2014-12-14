@@ -13,9 +13,9 @@ import java.util.UUID;
 import spartagold.framework.LoggerUtil;
 
 /**
- * Transaction object which contains all necessary information to conduct a valid transaction.
- * Contains a get method for all instance variables, and a set function for variables allowed
- * to change.
+ * Transaction object which contains all necessary information to conduct a
+ * valid transaction. Contains a get method for all instance variables, and a
+ * set function for variables allowed to change.
  * 
  * @author Art Tucay Jr., Paul Portela
  * @version 1.0.0
@@ -36,9 +36,11 @@ public class Transaction implements Serializable
 
 	/**
 	 * Constructor initializes instance variables with parameters.
-	 *
-	 * @param receiverPubKey		String of receiver's public key
-	 * @param amount				double number of amount being sent
+	 * 
+	 * @param receiverPubKey
+	 *            String of receiver's public key
+	 * @param amount
+	 *            double number of amount being sent
 	 */
 
 	public Transaction(String receiverPubKey, double amount)
@@ -68,7 +70,6 @@ public class Transaction implements Serializable
 		LoggerUtil.getLogger().fine("New transaction created - ID: " + id);
 
 	}
-	
 
 	public String getID()
 	{
@@ -79,7 +80,7 @@ public class Transaction implements Serializable
 	{
 		return amount;
 	}
-	
+
 	public void setAmount(Double a)
 	{
 		this.amount = a;
@@ -122,15 +123,21 @@ public class Transaction implements Serializable
 
 	public void addUnspentIds(BlockChain bc)
 	{
-		if(amount > 0)
+		if (amount > 0)
 		{
 			for (int i = 0; i < bc.getChainSize(); i++)
 			{
 				Block tempBlock = bc.getChain().get(i);
 				for (Transaction t : tempBlock.getTransactions())
 				{
-					if (t.getReceiverPubKey() == senderPubKey && t.isSpent() == false)
+					System.out.println("In block class: ------------------->" + t.getAmount());
+					System.out.println("transaction pub: " + t.getReceiverPubKey());
+					System.out.println("my pub: " + senderPubKey);
+					System.out.println("is it spend?" + t.isSpent);
+					if (t.getReceiverPubKey().equals(senderPubKey) && t.isSpent() == false)
 					{
+						System.out.println("in the block class if statement chekcking pub");
+						System.out.println(t.getAmount());
 						transactionTotal += t.getAmount();
 						unspentIds.add(t.getID());
 					}
@@ -140,41 +147,47 @@ public class Transaction implements Serializable
 					}
 				}
 			}
+			System.out.println("Amount: ---------------->" + amount);
+			System.out.println("Transaction: ---------------->" + transactionTotal);
+			if (transactionTotal < amount)
+			{
+				unspentIds = null;
+			}
 		}
+		System.out.println("In block class unspend ids: ---------------->" + unspentIds);
 	}
-	
+
 	public ArrayList<String> getUnspentIds()
 	{
 		return unspentIds;
 	}
-	
+
 	public double getTransactionTotal()
 	{
 		return transactionTotal;
 	}
 
-
 	public void setTransactionTotal(double transactionTotal)
 	{
 		this.transactionTotal = transactionTotal;
 	}
-	
+
 	public String getDate()
 	{
 		return date;
 	}
-	
+
 	@Override
-    public boolean equals(Object object)
-    {
-        boolean sameSame = false;
+	public boolean equals(Object object)
+	{
+		boolean sameSame = false;
 
-        if (object != null && object instanceof Transaction)
-        {
-            sameSame = this.id.equals(((Transaction) object).id);
-        }
+		if (object != null && object instanceof Transaction)
+		{
+			sameSame = this.id.equals(((Transaction) object).id);
+		}
 
-        return sameSame;
-    }
-	
+		return sameSame;
+	}
+
 }

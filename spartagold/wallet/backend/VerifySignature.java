@@ -10,8 +10,9 @@ import org.apache.commons.codec.binary.Base64;
 import spartagold.framework.LoggerUtil;
 
 /**
- * Verifies a signed transaction by comparing the signed byte array to the original
- * transaction string, using the sender's public key. Uses base 64 to decode key.
+ * Verifies a signed transaction by comparing the signed byte array to the
+ * original transaction string, using the sender's public key. Uses base 64 to
+ * decode key.
  * 
  * @author Art Tucay Jr., Paul Portela
  * @version 1.0.0
@@ -23,10 +24,13 @@ class VerifySignature
 
 	/**
 	 * Constructor performs process upon creation.
-	 *
-	 * @param senderPubKey			String of sender's public key
-	 * @param signed				byte array of the signed transaction string
-	 * @param trans 				String of transaction object
+	 * 
+	 * @param senderPubKey
+	 *            String of sender's public key
+	 * @param signed
+	 *            byte array of the signed transaction string
+	 * @param trans
+	 *            String of transaction object
 	 */
 	public VerifySignature(String senderPubKey, byte[] signed, String trans)
 	{
@@ -57,7 +61,7 @@ class VerifySignature
 
 			verifies = sig.verify(sigToVerify);
 
-		} 
+		}
 		catch (Exception e)
 		{
 			System.err.println("Caught exception " + e.toString());

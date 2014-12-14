@@ -1,36 +1,49 @@
 package spartagold.wallet.frontend;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-
-import org.apache.commons.lang3.SerializationUtils;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.PeerInfo;
-import spartagold.framework.PeerMessage;
-import spartagold.wallet.backend.BlockChain;
 import spartagold.wallet.backend.GenKeys;
 import spartagold.wallet.backend.Miner;
 import spartagold.wallet.backend.SpartaGoldNode;
 import spartagold.wallet.backend.Transaction;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
 /**
- * Front end graphical user interface that accesses all functionality of the SpartaGold Wallet,
- * then broadcasts messages to known peers. A connection is established at the start of the
- * Wallet, along with a unique public and private key.
+ * Front end graphical user interface that accesses all functionality of the
+ * SpartaGold Wallet, then broadcasts messages to known peers. A connection is
+ * established at the start of the Wallet, along with a unique public and
+ * private key.
  * 
  * @author Art Tucay Jr., Paul Portela
  * @version 1.0.0
@@ -38,6 +51,7 @@ import java.util.logging.Level;
 
 public class WalletGUI
 {
+	private JTextArea taMineFeed;
 	private JFrame frmSpartagoldWallet;
 	private JTextField tfAmount;
 	private JTextField tfAddress;
@@ -48,7 +62,6 @@ public class WalletGUI
 	private String[] transactionColumns = { "Date and Time", "Status", "To/From Address", "Amount" };
 	private SpartaGoldNode peer;
 	private ArrayList<Transaction> myTransactionsList;
-	
 
 	/**
 	 * Launch the application.
@@ -74,12 +87,12 @@ public class WalletGUI
 						LoggerUtil.getLogger().fine("Public and private keys generated.");
 					}
 					LoggerUtil.getLogger().fine("Connecting to SpartaGold network...");
-					
-					WalletGUI window = new WalletGUI("localhost", 9004, 5,new PeerInfo("localhost", 9005));
-					
+
+					WalletGUI window = new WalletGUI("localhost", 9004, 5, new PeerInfo("localhost", 9005));
+
 					window.frmSpartagoldWallet.setVisible(true);
 
-				} 
+				}
 				catch (Exception e)
 				{
 					e.printStackTrace();
@@ -97,19 +110,27 @@ public class WalletGUI
 	{
 		peer = new SpartaGoldNode(maxpeers, mypd);
 		peer.buildPeers(initialhost, initialport, 2);
-		(new Thread(){public void run(){peer.mainLoop();}}).start();
-		
+		(new Thread()
+		{
+			public void run()
+			{
+				peer.mainLoop();
+			}
+		}).start();
+
 		myTransactionsList = peer.getMyTransactions();
 		myBalance = getBalance();
 
-//		//Requesting blockchain from peers
-//		for (PeerInfo pid : peer.getAllPeers())
-//		{
-//			List<PeerMessage> msg = peer.connectAndSend(pid, SpartaGoldNode.GETBLOCKCHAIN, null, true);
-//			BlockChain bc = (BlockChain) SerializationUtils.deserialize(msg.get(0).getMsgDataBytes());
-//			if(peer.getBlockChain().getChainSize() < bc.getChainSize())
-//				peer.setBlockchain(bc);
-//		}
+		// //Requesting blockchain from peers
+		// for (PeerInfo pid : peer.getAllPeers())
+		// {
+		// List<PeerMessage> msg = peer.connectAndSend(pid,
+		// SpartaGoldNode.GETBLOCKCHAIN, null, true);
+		// BlockChain bc = (BlockChain)
+		// SerializationUtils.deserialize(msg.get(0).getMsgDataBytes());
+		// if(peer.getBlockChain().getChainSize() < bc.getChainSize())
+		// peer.setBlockchain(bc);
+		// }
 
 		// GUI start
 		frmSpartagoldWallet = new JFrame();
@@ -119,12 +140,14 @@ public class WalletGUI
 		frmSpartagoldWallet.setResizable(false);
 		frmSpartagoldWallet.setBounds(100, 100, 625, 350);
 		frmSpartagoldWallet.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//frmSpartagoldWallet.setUndecorated(true);
-		frmSpartagoldWallet.addWindowListener(new WindowAdapter() {
-		    public void windowClosing(WindowEvent e) {
-		    	LoggerUtil.getLogger().fine("Saving block chain...");
-		    	peer.saveBlockchain();
-		    }
+		// frmSpartagoldWallet.setUndecorated(true);
+		frmSpartagoldWallet.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				LoggerUtil.getLogger().fine("Saving block chain...");
+				peer.saveBlockchain();
+			}
 		});
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -159,7 +182,7 @@ public class WalletGUI
 		tabbedPane.setBackgroundAt(2, Color.WHITE);
 		mine.setLayout(null);
 
-		JTextArea taMineFeed = new JTextArea(80, 80);
+		taMineFeed = new JTextArea(80, 80);
 		taMineFeed.setLineWrap(true);
 		taMineFeed.setWrapStyleWord(true);
 		taMineFeed.setText("To begin mining, click the gold button.");
@@ -167,40 +190,41 @@ public class WalletGUI
 		taMineFeed.setBounds(10, 10, 314, 273);
 		mine.add(taMineFeed);
 		taMineFeed.setEditable(false);
-		//taMineFeed.append(str);
-		//taMineFeed.setCaretPosition(taMineFeed.getText().length() - 1);
-		
-		BufferedImage mineButtonIcon = ImageIO.read(new File("img/mineButton.png"));
+		// taMineFeed.append("paul");
+		taMineFeed.setCaretPosition(taMineFeed.getText().length() - 1);
+
+		BufferedImage mineButtonIcon = ImageIO.read(new File("/home/paul/Desktop/spartagold2/img/mineButton.png"));
 		JButton btnMine = new JButton(new ImageIcon(mineButtonIcon));
 		btnMine.setBorder(BorderFactory.createEmptyBorder());
 		btnMine.setContentAreaFilled(false);
 		btnMine.setBounds(370, 175, 200, 75);
 		mine.add(btnMine);
-		
+
 		btnMine.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0)
 			{
 				LoggerUtil.getLogger().fine("Mining for Gold selected. Creating Miner object...");
 				Miner m = null;
-				
 				try
 				{
 					m = new Miner(peer);
-					Runnable r = m;
-					LoggerUtil.getLogger().fine("Runnable created. Creating thread...");
-					Thread t = new Thread(r);
-					t.start();
-				} 
+					if (m.hasATransactionToVerify())
+					{
+						Runnable r = m;
+						LoggerUtil.getLogger().fine("Runnable created. Creating thread...");
+						Thread t = new Thread(r);
+						t.start();
+					}
+					else
+					{
+						LoggerUtil.getLogger().fine("Currently there are no transactions to comfirm");
+					}
+				}
 				catch (IOException e)
 				{
 					e.printStackTrace();
 				}
-//				for (PeerInfo pid : peer.getAllPeers())
-//				{
-//					LoggerUtil.getLogger().fine("Broadcasting...");
-//					peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, m.getBlock());
-//				}
 			}
 		});
 
@@ -228,7 +252,7 @@ public class WalletGUI
 		lblBalance.setForeground(Color.BLACK);
 		lblBalance.setFont(new Font("Segoe UI Semibold", Font.BOLD, 20));
 
-		BufferedImage sendButtonIcon = ImageIO.read(new File("img/sendButton.png"));
+		BufferedImage sendButtonIcon = ImageIO.read(new File("/home/paul/Desktop/spartagold2/img/sendButton.png"));
 		JButton btnSend = new JButton(new ImageIcon(sendButtonIcon));
 		btnSend.setBorder(BorderFactory.createEmptyBorder());
 		btnSend.setContentAreaFilled(false);
@@ -243,6 +267,7 @@ public class WalletGUI
 					LoggerUtil.getLogger().fine("Sending transaction " + tfAmount.getText() + " to " + tfAddress.getText());
 					Transaction t = new Transaction(tfAddress.getText(), Double.parseDouble(tfAmount.getText()));
 					t.addUnspentIds(peer.getBlockChain());
+					System.out.println("####################: " + t.getUnspentIds());
 					for (PeerInfo pid : peer.getAllPeers())
 					{
 						LoggerUtil.getLogger().fine("Broadcasting...");
@@ -278,14 +303,12 @@ public class WalletGUI
 		tfAddress.setBounds(92, 30, 300, 20);
 		panel.add(tfAddress);
 		tfAddress.setColumns(10);
-		
-		
-		BufferedImage logo = ImageIO.read(new File("img/spartagoldlogo02.png"));
+
+		BufferedImage logo = ImageIO.read(new File("/home/paul/Desktop/spartagold2/img/spartagoldlogo02.png"));
 		Image scaledLogo = logo.getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH);
 		JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
 		logoLabel.setBounds(79, 170, 450, 112);
 		send.add(logoLabel);
-		
 
 		// GUI end
 	}
@@ -297,25 +320,25 @@ public class WalletGUI
 		{
 			previousTransactions[i][0] = myTransactionsList.get(i).getDate();
 			if (myTransactionsList.get(i).getSenderPubKey() == peer.readPubKey())
-				{
-					previousTransactions[i][1] = "Sent";
-					previousTransactions[i][2] = myTransactionsList.get(i).getReceiverPubKey();
-				}
+			{
+				previousTransactions[i][1] = "Sent";
+				previousTransactions[i][2] = myTransactionsList.get(i).getReceiverPubKey();
+			}
 			else if (myTransactionsList.get(i).getReceiverPubKey() == peer.readPubKey())
-				{
-					previousTransactions[i][1] = "Received";
-					previousTransactions[i][2] = peer.readPubKey();
-				}
+			{
+				previousTransactions[i][1] = "Received";
+				previousTransactions[i][2] = peer.readPubKey();
+			}
 			else
-				{
-					previousTransactions[i][1] = "Unknown";
-					previousTransactions[i][2] = myTransactionsList.get(i).getSenderPubKey();
-				}
+			{
+				previousTransactions[i][1] = "Unknown";
+				previousTransactions[i][2] = myTransactionsList.get(i).getSenderPubKey();
+			}
 			previousTransactions[i][3] = myTransactionsList.get(i).getAmount();
 		}
 		LoggerUtil.getLogger().fine("Transaction table filled.");
 	}
-	
+
 	private double getBalance()
 	{
 		double balance = 0;
@@ -335,10 +358,9 @@ public class WalletGUI
 		{
 			myIP = new URL("http://myip.dnsomatic.com/");
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					myIP.openStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(myIP.openStream()));
 			return in.readLine();
-		} 
+		}
 		catch (Exception e)
 		{
 			try
@@ -347,7 +369,7 @@ public class WalletGUI
 
 				BufferedReader in = new BufferedReader(new InputStreamReader(myIP.openStream()));
 				return in.readLine();
-			} 
+			}
 			catch (Exception e1)
 			{
 				try
@@ -357,7 +379,7 @@ public class WalletGUI
 					BufferedReader in = new BufferedReader(new InputStreamReader(myIP.openStream()));
 					myIpAddress = in.readLine();
 					return in.readLine();
-				} 
+				}
 				catch (Exception e2)
 				{
 					e2.printStackTrace();

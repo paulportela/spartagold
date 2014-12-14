@@ -1,14 +1,13 @@
 package spartagold.wallet.backend;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
+
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.PeerInfo;
 
 /**
- * Initiates proof-of-work and saves solution into a block object. Adds transaction
- * to block.
+ * Initiates proof-of-work and saves solution into a block object. Adds
+ * transaction to block.
  * 
  * @author Art Tucay Jr., Paul Portela
  * @version 1.0.0
@@ -40,30 +39,32 @@ public class Miner implements Runnable
 	public void run()
 	{
 		LoggerUtil.getLogger().fine("Mining has begun.");
+		peer.setStatus("Mining has begun.");
 		try
 		{
 			block.addTransaction(unconfirmedTransaction);
 			LoggerUtil.getLogger().fine("Transaction added to block.");
 			double total = unconfirmedTransaction.getTransactionTotal() - unconfirmedTransaction.getAmount();
-			//t.setAmount(t.getAmount() - Block.FEE);
-			if(total > 0)
+			// t.setAmount(t.getAmount() - Block.FEE);
+			if (total > 0)
 			{
-				this.change = new Transaction(unconfirmedTransaction.getSenderPubKey(), total);
+				change = new Transaction(unconfirmedTransaction.getSenderPubKey(), total);
 				block.addTransaction(change);
 				LoggerUtil.getLogger().fine("Change transaction added to block.");
 			}
-			
+
 			LoggerUtil.getLogger().fine("Finding solution...");
+			peer.setStatus("Finding solution...");
 			solution = ProofOfWork.findProof(block.toString());
 			block.setSolution(solution);
 			LoggerUtil.getLogger().fine("Solution has been set in block.");
-			
+			peer.setStatus("Solution has been found. You were awarded: " + Block.REWARDAMOUNT);
 			for (PeerInfo pid : peer.getAllPeers())
 			{
 				LoggerUtil.getLogger().fine("Broadcasting...");
 				peer.connectAndSendObject(pid, SpartaGoldNode.FOUNDSOLUTION, block);
 			}
-		} 
+		}
 		catch (Exception e)
 		{
 			System.err.println("Caught exception " + e.toString());
@@ -79,6 +80,13 @@ public class Miner implements Runnable
 	{
 		block.addTransaction(trans);
 	}
-	
-	
+
+	public boolean hasATransactionToVerify()
+	{
+		if (unconfirmedTransaction == null)
+			return false;
+		else
+			return true;
+	}
+
 }

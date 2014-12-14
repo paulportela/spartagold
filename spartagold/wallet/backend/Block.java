@@ -6,12 +6,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
+
 import spartagold.framework.LoggerUtil;
 
 /**
- * Contains a reward transaction awarded to the specified miner, the solution found,
- * and an ArrayList of transactions solved. Get, set, add, and toString methods
- * provide access to instance variables.
+ * Contains a reward transaction awarded to the specified miner, the solution
+ * found, and an ArrayList of transactions solved. Get, set, add, and toString
+ * methods provide access to instance variables.
  * 
  * @author Art Tucay Jr., Paul Portela
  * @version 1.0.0
@@ -26,7 +27,7 @@ public class Block implements Serializable
 	private String previousBlockID;
 	private ArrayList<Transaction> transactionList;
 	public static final double FEE = 0.1;
-	private static final double REWARDAMOUNT = 50;
+	public static final double REWARDAMOUNT = 50;
 
 	public Block() throws IOException
 	{
@@ -36,7 +37,8 @@ public class Block implements Serializable
 		minerPubKey = br.readLine();
 		br.close();
 		transactionList = new ArrayList<Transaction>();
-		//transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT + FEE));
+		// transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT +
+		// FEE));
 		transactionList.add(new Transaction(minerPubKey, REWARDAMOUNT));
 		LoggerUtil.getLogger().fine("New block created - ID: " + id);
 	}
@@ -89,21 +91,19 @@ public class Block implements Serializable
 	@Override
 	public String toString()
 	{
-		return "Block [id=" + id + ", minerPubKey=" + minerPubKey
-				+ ", previousBlockID=" + previousBlockID + ", trans="
-				+ transactionList + "]";
+		return "Block [id=" + id + ", minerPubKey=" + minerPubKey + ", previousBlockID=" + previousBlockID + ", trans=" + transactionList + "]";
 	}
-	
+
 	@Override
-    public boolean equals(Object object)
-    {
-        boolean sameSame = false;
+	public boolean equals(Object object)
+	{
+		boolean sameSame = false;
 
-        if (object != null && object instanceof Block)
-        {
-            sameSame = this.id.equals(((Block) object).id);
-        }
+		if (object != null && object instanceof Block)
+		{
+			sameSame = this.id.equals(((Block) object).id);
+		}
 
-        return sameSame;
-    }
+		return sameSame;
+	}
 }

@@ -3,6 +3,7 @@ package spartagold.wallet.backend;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+
 import spartagold.framework.LoggerUtil;
 
 /**
@@ -33,32 +34,45 @@ public class Verify
 		String senderPubKey = transaction.getSenderPubKey();
 		byte[] signed = transaction.getSigned();
 		String trans = transaction.toString();
-		
+
 		VerifySignature ver = new VerifySignature(senderPubKey, signed, trans);
-		
+
 		if (ver.isVerified())
 		{
+			System.out.println("1 In verified ---------------------------->");
+			double tmpAmount = 0;
 			ArrayList<String> unspentIds = transaction.getUnspentIds();
 			for (int i = 0; i < bc.getChainSize(); i++)
 			{
 				Block tempBlock = bc.getChain().get(i);
+				System.out.println("For loop temp block----------------: " + tempBlock)
 				for (Transaction t : tempBlock.getTransactions())
 				{
-					for(int j = 0; j < unspentIds.size(); j++)
+					for (int j = 0; j < unspentIds.size(); j++)
 					{
-						if (unspentIds.get(j) == t.getID() && t.isSpent())
+						if (unspentIds.get(j) == t.getID())
 						{
-							return false;
+							if (t.isSpent())
+							{
+								System.out.println("2 In verified ---------------------------->");
+								return false;
+							}
+							else
+							{
+								tmpAmount += t.getAmount();
+							}
 						}
 					}
 				}
 			}
-			return true;
+			if (tmpAmount >= transaction.getAmount())
+			{
+				System.out.println("3 In verified ---------------------------->");
+				return true;
+			}
 		}
-		else
-		{
-			return false;
-		}
+		System.out.println("4 In verified ---------------------------->");
+		return false;
 	}
 
 	/**
