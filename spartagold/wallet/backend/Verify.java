@@ -45,7 +45,7 @@ public class Verify
 			for (int i = 0; i < bc.getChainSize(); i++)
 			{
 				Block tempBlock = bc.getChain().get(i);
-				System.out.println("For loop temp block----------------: " + tempBlock)
+				System.out.println("For loop temp block----------------: " + tempBlock);
 				for (Transaction t : tempBlock.getTransactions())
 				{
 					for (int j = 0; j < unspentIds.size(); j++)

@@ -31,6 +31,7 @@ public class Miner implements Runnable
 	{
 		this.peer = peer;
 		this.unconfirmedTransaction = peer.getTransaction();
+		System.out.println("Miner.java: peer.getTransaction() called");
 		block = new Block();
 		this.solution = null;
 		LoggerUtil.getLogger().fine("Miner object created.");
@@ -46,6 +47,7 @@ public class Miner implements Runnable
 			LoggerUtil.getLogger().fine("Transaction added to block.");
 			double total = unconfirmedTransaction.getTransactionTotal() - unconfirmedTransaction.getAmount();
 			// t.setAmount(t.getAmount() - Block.FEE);
+			System.out.println("Miner.java: unconfirmedTransaction.getTransactionTotal() - unconfirmedTransaction.getAmount() " + total);
 			if (total > 0)
 			{
 				change = new Transaction(unconfirmedTransaction.getSenderPubKey(), total);

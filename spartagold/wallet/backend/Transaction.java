@@ -130,13 +130,13 @@ public class Transaction implements Serializable
 				Block tempBlock = bc.getChain().get(i);
 				for (Transaction t : tempBlock.getTransactions())
 				{
-					System.out.println("In block class: ------------------->" + t.getAmount());
-					System.out.println("transaction pub: " + t.getReceiverPubKey());
-					System.out.println("my pub: " + senderPubKey);
-					System.out.println("is it spend?" + t.isSpent);
+					System.out.println("Transaction.java transaction amount: ------------------->" + t.getAmount());
+					System.out.println("Transaction.java receiver pub: " + t.getReceiverPubKey());
+					System.out.println("Transaction.java my pub: " + senderPubKey);
+					System.out.println("Transaction.java  is transaction spent?" + t.isSpent);
 					if (t.getReceiverPubKey().equals(senderPubKey) && t.isSpent() == false)
 					{
-						System.out.println("in the block class if statement chekcking pub");
+						System.out.println("Transaction.java TransactionHandler: if statement chekcking pub");
 						System.out.println(t.getAmount());
 						transactionTotal += t.getAmount();
 						unspentIds.add(t.getID());
@@ -144,17 +144,19 @@ public class Transaction implements Serializable
 					if (transactionTotal >= amount)
 					{
 						i = bc.getChainSize();
+						System.out.println("Transaction.java transactionTotal >= amount");
 					}
 				}
 			}
-			System.out.println("Amount: ---------------->" + amount);
-			System.out.println("Transaction: ---------------->" + transactionTotal);
+			System.out.println("Transaction.java amount:" + amount);
+			System.out.println("Transaction.java transactionTotal:" + transactionTotal);
 			if (transactionTotal < amount)
 			{
+				System.out.println("SpartagoldNode.java TransactionHandler transactionTotal < amount");
 				unspentIds = null;
 			}
 		}
-		System.out.println("In block class unspend ids: ---------------->" + unspentIds);
+		System.out.println("Transaction.java unspendIds:" + unspentIds);
 	}
 
 	public ArrayList<String> getUnspentIds()
