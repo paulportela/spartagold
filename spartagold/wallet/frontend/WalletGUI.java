@@ -10,11 +10,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
+//import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
+//import java.io.InputStreamReader;
+//import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -30,7 +30,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 
 import spartagold.framework.LoggerUtil;
 import spartagold.framework.PeerInfo;
@@ -55,7 +54,7 @@ public class WalletGUI
 	private JFrame frmSpartagoldWallet;
 	private JTextField tfAmount;
 	private JTextField tfAddress;
-	private static String myIpAddress;
+	//private static String myIpAddress;
 	private double myBalance;
 	private JTable table;
 	private Object[][] previousTransactions;
@@ -77,7 +76,7 @@ public class WalletGUI
 			{
 				try
 				{
-					myIpAddress = getIpAddress();
+					//myIpAddress = getIpAddress();
 					boolean checkPubKey = new File("publickey.txt").exists();
 					boolean checkPrivKey = new File("privatekey.txt").exists();
 					if (!checkPubKey && !checkPrivKey)
@@ -155,13 +154,13 @@ public class WalletGUI
 		frmSpartagoldWallet.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
 		JPanel send = new JPanel();
-		send.setBackground(new Color(11, 46, 70));
+		send.setBackground(Color.BLACK);
 		tabbedPane.addTab("Send", null, send, null);
 		tabbedPane.setBackgroundAt(0, Color.WHITE);
 		send.setLayout(null);
 
 		JPanel transactions = new JPanel();
-		transactions.setBackground(new Color(11, 46, 70));
+		transactions.setBackground(Color.BLACK);
 		tabbedPane.addTab("Transactions", null, transactions, null);
 		tabbedPane.setBackgroundAt(1, Color.WHITE);
 		transactions.setLayout(null);
@@ -176,10 +175,25 @@ public class WalletGUI
 		transactions.add(scrollPane);
 
 		JPanel mine = new JPanel();
-		mine.setBackground(new Color(11, 46, 70));
+		mine.setBackground(Color.BLACK);
 		tabbedPane.addTab("Mine", null, mine, null);
 		tabbedPane.setBackgroundAt(2, Color.WHITE);
 		mine.setLayout(null);
+		
+		BufferedImage pickaxe1 = ImageIO.read(new File("img/pickaxe2.gif"));
+		Image scaledPickaxe1 = pickaxe1.getScaledInstance(pickaxe1.getWidth(), pickaxe1.getHeight(), Image.SCALE_SMOOTH);
+		JLabel pickaxeLabel = new JLabel(new ImageIcon(scaledPickaxe1));
+		pickaxeLabel.setBounds(370, -18, 200, 200);
+		mine.add(pickaxeLabel);
+		
+		BufferedImage mineBG = ImageIO.read(new File("img/defaultbackground.png"));
+		Image scaledMineBG = mineBG.getScaledInstance(mineBG.getWidth(), mineBG.getHeight(), Image.SCALE_SMOOTH);
+		
+		BufferedImage transactionBG = ImageIO.read(new File("img/defaultbackground.png"));
+		Image scaledTransactionBG = transactionBG.getScaledInstance(transactionBG.getWidth(), transactionBG.getHeight(), Image.SCALE_SMOOTH);
+		JLabel transactionBGLabel = new JLabel(new ImageIcon(scaledTransactionBG));
+		transactionBGLabel.setBounds(2, 2, 610, 290);
+		transactions.add(transactionBGLabel);
 
 		taMineFeed = new JTextArea(80, 80);
 		taMineFeed.setLineWrap(true);
@@ -189,15 +203,18 @@ public class WalletGUI
 		taMineFeed.setBounds(10, 10, 314, 273);
 		mine.add(taMineFeed);
 		taMineFeed.setEditable(false);
-		// taMineFeed.append("paul");
+		// taMineFeed.append("");
 		taMineFeed.setCaretPosition(taMineFeed.getText().length() - 1);
 
-		BufferedImage mineButtonIcon = ImageIO.read(new File("/home/paul/Desktop/spartagold2/img/mineButton.png"));
+		BufferedImage mineButtonIcon = ImageIO.read(new File("img/mineButton.png"));
 		JButton btnMine = new JButton(new ImageIcon(mineButtonIcon));
 		btnMine.setBorder(BorderFactory.createEmptyBorder());
 		btnMine.setContentAreaFilled(false);
 		btnMine.setBounds(370, 175, 200, 75);
 		mine.add(btnMine);
+		JLabel mineBGLabel = new JLabel(new ImageIcon(scaledMineBG));
+		mineBGLabel.setBounds(2, 2, 610, 290);
+		mine.add(mineBGLabel);
 
 		btnMine.addActionListener(new ActionListener()
 		{
@@ -229,36 +246,71 @@ public class WalletGUI
 			}
 		});
 
-		JPanel panel = new JPanel();
-		panel.setBackground(UIManager.getColor("activeCaption"));
-		panel.setBounds(20, 23, 571, 136);
-		send.add(panel);
-		panel.setLayout(null);
-
-		JLabel lblWalletAmount = new JLabel(Double.toString(myBalance));
-		lblWalletAmount.setBounds(421, 66, 92, 39);
-		panel.add(lblWalletAmount);
-		lblWalletAmount.setForeground(Color.BLACK);
-		lblWalletAmount.setFont(new Font("Segoe UI Light", Font.BOLD, 27));
-
+		BufferedImage sendBackground = ImageIO.read(new File("img/sendbackground.png"));
+		Image scaledSendBackground = sendBackground.getScaledInstance(sendBackground.getWidth(), sendBackground.getHeight(), Image.SCALE_SMOOTH);
+		
+		BufferedImage logo = ImageIO.read(new File("img/spartagoldlogo02.png"));
+		Image scaledLogo = logo.getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH);
+		JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
+		logoLabel.setBounds(79, 170, 450, 112);
+		send.add(logoLabel);
+		
 		JLabel lblSG2 = new JLabel("SG");
-		lblSG2.setBounds(523, 66, 44, 39);
-		panel.add(lblSG2);
-		lblSG2.setForeground(Color.BLACK);
+		lblSG2.setBounds(541, 83, 44, 39);
+		send.add(lblSG2);
+		lblSG2.setForeground(Color.WHITE);
 		lblSG2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 27));
-
+				
 		JLabel lblBalance = new JLabel("Balance:");
-		lblBalance.setBounds(445, 29, 92, 26);
-		panel.add(lblBalance);
-		lblBalance.setForeground(Color.BLACK);
+		lblBalance.setBounds(455, 42, 109, 26);
+		send.add(lblBalance);
+		lblBalance.setForeground(Color.WHITE);
 		lblBalance.setFont(new Font("Segoe UI Semibold", Font.BOLD, 20));
-
-		BufferedImage sendButtonIcon = ImageIO.read(new File("/home/paul/Desktop/spartagold2/img/sendButton.png"));
+		
+		BufferedImage sendButtonIcon = ImageIO.read(new File("img/sendButton.png"));
 		JButton btnSend = new JButton(new ImageIcon(sendButtonIcon));
+		btnSend.setBounds(291, 80, 100, 38);
+		send.add(btnSend);
 		btnSend.setBorder(BorderFactory.createEmptyBorder());
 		btnSend.setContentAreaFilled(false);
-		btnSend.setBounds(292, 66, 100, 38);
-		panel.add(btnSend);
+						
+		tfAmount = new JTextField();
+		tfAmount.setBounds(110, 100, 100, 20);
+		send.add(tfAmount);
+		tfAmount.setColumns(10);
+		
+		JLabel lblAmount = new JLabel("Amount:");
+		lblAmount.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAmount.setBounds(35, 95, 82, 26);
+		send.add(lblAmount);
+		lblAmount.setForeground(Color.WHITE);
+		
+		JLabel lblAddress = new JLabel("Address:");
+		lblAddress.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblAddress.setBounds(35, 50, 75, 26);
+		send.add(lblAddress);
+		lblAddress.setForeground(Color.WHITE);
+		
+		JLabel lblSG1 = new JLabel("SG");
+		lblSG1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblSG1.setBounds(229, 95, 20, 26);
+		send.add(lblSG1);
+		lblSG1.setForeground(Color.WHITE);
+						
+		tfAddress = new JTextField();
+		tfAddress.setBounds(110, 55, 285, 20);
+		send.add(tfAddress);
+		tfAddress.setColumns(10);
+								
+		JLabel lblWalletAmount = new JLabel(Double.toString(myBalance));
+		lblWalletAmount.setBounds(421, 85, 122, 39);
+		send.add(lblWalletAmount);
+		lblWalletAmount.setForeground(Color.WHITE);
+		lblWalletAmount.setFont(new Font("Segoe UI Light", Font.BOLD, 24));
+		JLabel sendBackgroundLabel = new JLabel(new ImageIcon(scaledSendBackground));
+		sendBackgroundLabel.setBounds(2, 2, 610, 290);
+		send.add(sendBackgroundLabel);
+		
 		btnSend.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0)
@@ -279,37 +331,6 @@ public class WalletGUI
 				tfAddress.setText("");
 			}
 		});
-
-		tfAmount = new JTextField();
-		tfAmount.setBounds(92, 83, 100, 20);
-		panel.add(tfAmount);
-		tfAmount.setColumns(10);
-
-		JLabel lblAmount = new JLabel("Amount:");
-		lblAmount.setBounds(10, 80, 58, 26);
-		panel.add(lblAmount);
-		lblAmount.setForeground(Color.BLACK);
-
-		JLabel lblAddress = new JLabel("Address:");
-		lblAddress.setBounds(10, 27, 63, 26);
-		panel.add(lblAddress);
-		lblAddress.setForeground(Color.BLACK);
-
-		JLabel lblSG1 = new JLabel("SG");
-		lblSG1.setBounds(202, 80, 20, 26);
-		panel.add(lblSG1);
-		lblSG1.setForeground(Color.BLACK);
-
-		tfAddress = new JTextField();
-		tfAddress.setBounds(92, 30, 300, 20);
-		panel.add(tfAddress);
-		tfAddress.setColumns(10);
-
-		BufferedImage logo = ImageIO.read(new File("/home/paul/Desktop/spartagold2/img/spartagoldlogo02.png"));
-		Image scaledLogo = logo.getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH);
-		JLabel logoLabel = new JLabel(new ImageIcon(scaledLogo));
-		logoLabel.setBounds(79, 170, 450, 112);
-		send.add(logoLabel);
 
 		// GUI end
 	}
@@ -340,6 +361,7 @@ public class WalletGUI
 		LoggerUtil.getLogger().fine("Transaction table filled.");
 	}
 
+	/**
 	public static String getIpAddress()
 	{
 		URL myIP;
@@ -377,4 +399,5 @@ public class WalletGUI
 		}
 		return null;
 	}
+	*/
 }
