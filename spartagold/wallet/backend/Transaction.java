@@ -21,6 +21,7 @@ import spartagold.framework.LoggerUtil;
  * @version 1.0.0
  */
 
+@SuppressWarnings("serial")
 public class Transaction implements Serializable
 {
 	private String trans;
@@ -179,7 +180,6 @@ public class Transaction implements Serializable
 		return date;
 	}
 
-	@Override
 	public boolean equals(Object object)
 	{
 		boolean sameSame = false;
@@ -191,5 +191,4 @@ public class Transaction implements Serializable
 
 		return sameSame;
 	}
-
 }
