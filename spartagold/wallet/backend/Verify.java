@@ -39,27 +39,35 @@ public class Verify
 
 		if (ver.isVerified())
 		{
-			System.out.println("1 In verified ---------------------------->");
+			System.out.println("");
+			System.out.println("Verify: temp amount = 0, creating ArrayList unspentIds");
 			double tmpAmount = 0;
 			ArrayList<String> unspentIds = transaction.getUnspentIds();
 			for (int i = 0; i < bc.getChainSize(); i++)
 			{
 				Block tempBlock = bc.getChain().get(i);
-				System.out.println("For loop temp block----------------: " + tempBlock)
+				System.out.println("Verify: Block ID: " + tempBlock.getId());
+				System.out.println("Verify: Block solution: " + tempBlock.getSolution());
 				for (Transaction t : tempBlock.getTransactions())
 				{
+					System.out.println("Verify: Transaction ID: " + t.getID());
+					System.out.println("Verify: Transaction amount: " + t.getAmount());
+					System.out.println("Verify: UnspentIds size: " + unspentIds.size());
 					for (int j = 0; j < unspentIds.size(); j++)
 					{
+						System.out.println("Verify: UnspentId: " + unspentIds.get(j));
 						if (unspentIds.get(j) == t.getID())
 						{
+							System.out.println("Verify: unspent ID matches transaction ID");
 							if (t.isSpent())
 							{
-								System.out.println("2 In verified ---------------------------->");
+								System.out.println("Verify: transaction spent: " + t.isSpent());
 								return false;
 							}
 							else
 							{
 								tmpAmount += t.getAmount();
+								System.out.println("Verify: temp amount is now: " + tmpAmount);
 							}
 						}
 					}
@@ -67,11 +75,11 @@ public class Verify
 			}
 			if (tmpAmount >= transaction.getAmount())
 			{
-				System.out.println("3 In verified ---------------------------->");
+				System.out.println("Verify: Temp amount >= transaction amount.");
 				return true;
 			}
 		}
-		System.out.println("4 In verified ---------------------------->");
+		System.out.println("Verify: transaction not verified.");
 		return false;
 	}
 
