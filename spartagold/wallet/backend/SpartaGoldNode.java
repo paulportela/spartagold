@@ -82,10 +82,10 @@ public class SpartaGoldNode extends Node implements Serializable
 		}
 
 		transactions = new ArrayList<Transaction>();
+		transactions.add(new Transaction("000", 2));
+
 		myTransactions = new ArrayList<Transaction>();
 		initializeMyTransactions();
-
-		// transactions.add(new Transaction("dsfads", 0));
 
 		mining = false;
 
@@ -529,5 +529,10 @@ public class SpartaGoldNode extends Node implements Serializable
 			}
 		}
 		return balance;
+	}
+
+	public void addMyTransaction(Transaction t)
+	{
+		myTransactions.add(t);
 	}
 }

@@ -18,7 +18,7 @@ import spartagold.framework.LoggerUtil;
 public class Verify
 {
 
-	public static final int NUMBER_OF_ZEROES = 5;
+	public static final int NUMBER_OF_ZEROES = 15;
 
 	/**
 	 * Verifies a transaction by checking if the sender has the funds to send
